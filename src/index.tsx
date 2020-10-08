@@ -1,17 +1,48 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import "@reach/dialog/styles.css";
+import React from "react";
+import ReactDOM from "react-dom";
+import { Dialog } from "@reach/dialog";
+import { Logo } from "./components/Logo";
+import { LoginForm, Props as LoginFormProps } from "./components/LoginForm";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+type OpenModalState = "none" | "login" | "register";
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+function App() {
+  const [openModal, setOpenModal] = React.useState<OpenModalState>("none");
+
+  const login: LoginFormProps["onSubmit"] = (formData) => {
+    console.log("login", formData);
+  };
+  const register: LoginFormProps["onSubmit"] = (formData) => {
+    console.log("register", formData);
+  };
+
+  return (
+    <div>
+      <Logo width="80" height="80" />
+      <h1>Bookshelf</h1>
+      <div>
+        <button onClick={() => setOpenModal("login")}>Login</button>
+      </div>
+      <div>
+        <button onClick={() => setOpenModal("register")}>Register</button>
+      </div>
+      <Dialog aria-label="Login form" isOpen={openModal === "login"}>
+        <div>
+          <button onClick={() => setOpenModal("none")}>Close</button>
+        </div>
+        <h3>Login</h3>
+        <LoginForm onSubmit={login} buttonText="Login" />
+      </Dialog>
+      <Dialog aria-label="Registration form" isOpen={openModal === "register"}>
+        <div>
+          <button onClick={() => setOpenModal("none")}>Close</button>
+        </div>
+        <h3>Register</h3>
+        <LoginForm onSubmit={register} buttonText="Register" />
+      </Dialog>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById("root"));
