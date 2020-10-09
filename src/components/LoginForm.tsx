@@ -1,11 +1,14 @@
-import React, { FC } from "react";
+/** @jsx jsx */
+import { jsx } from "@emotion/core";
+import React, { FC, ReactElement } from "react";
+import { FormGroup, Input, Spinner } from "./lib";
 
 export type Props = {
-  buttonText: string;
   onSubmit: (formData: { username: string; password: string }) => void;
+  submitButton: ReactElement;
 };
 
-export const LoginForm: FC<Props> = ({ onSubmit, buttonText }) => {
+export const LoginForm: FC<Props> = ({ onSubmit, submitButton }) => {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const { username, password } = event.currentTarget.elements as any;
@@ -17,17 +20,32 @@ export const LoginForm: FC<Props> = ({ onSubmit, buttonText }) => {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
+    <form
+      onSubmit={handleSubmit}
+      css={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        "> div": {
+          margin: "10px auto",
+          width: "100%",
+          maxWidth: "300px",
+        },
+      }}
+    >
+      <FormGroup>
         <label htmlFor="username">Username</label>
-        <input id="username" />
-      </div>
-      <div>
+        <Input id="username" />
+      </FormGroup>
+      <FormGroup>
         <label htmlFor="password">Password</label>
-        <input id="password" type="password" />
-      </div>
+        <Input id="password" type="password" />
+      </FormGroup>
       <div>
-        <button type="submit">{buttonText}</button>
+        <div>
+          {React.cloneElement(submitButton, { type: "submit" })}
+          <Spinner />
+        </div>
       </div>
     </form>
   );
