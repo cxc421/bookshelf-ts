@@ -4,11 +4,11 @@ import React, { useState, useEffect } from "react";
 
 import "./bootstrap";
 import Tooltip from "@reach/tooltip";
-import { FaSearch } from "react-icons/fa";
+import { FaSearch, FaTimes } from "react-icons/fa";
 import { Input, BookListUL, Spinner } from "./components/lib";
 import { BookRow, Book } from "./components/BookRow";
 import { client } from "./utils/api-client";
-// 🐨 import the client from './utils/api-client'
+import * as colors from "styles/colors";
 
 type Data = { books: Book[] } | null;
 type Status = "idle" | "loading" | "success";
@@ -18,20 +18,23 @@ function DiscoverBooksScreen() {
   const [data, setData] = useState<Data>(null);
   const [query, setQuery] = useState("");
   const [queried, setQueried] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!queried) return;
     setStatus("loading");
+    setError(null);
     client(`books?query=${encodeURIComponent(query)}`)
       .then(({ books }) => {
         setData({ books });
         setStatus("success");
       })
-      .catch((err) => console.error(err));
+      .catch((err) => setError(err));
   }, [queried, query]);
 
   const isLoading = status === "loading";
   const isSuccess = status === "success";
+  const isError = error !== null;
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,11 +66,24 @@ function DiscoverBooksScreen() {
                 background: "transparent",
               }}
             >
-              {isLoading ? <Spinner /> : <FaSearch aria-label="search" />}
+              {isError ? (
+                <FaTimes aria-label="error" css={{ color: colors.danger }} />
+              ) : isLoading ? (
+                <Spinner />
+              ) : (
+                <FaSearch aria-label="search" />
+              )}
             </button>
           </label>
         </Tooltip>
       </form>
+
+      {isError ? (
+        <div css={{ color: colors.danger }}>
+          <p>There was an error:</p>
+          <pre>{error?.message}</pre>
+        </div>
+      ) : null}
 
       {isSuccess ? (
         data?.books?.length ? (
