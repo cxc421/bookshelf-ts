@@ -82,3 +82,11 @@ export const Spinner = styled(FaSpinner)({
 Spinner.defaultProps = {
   "aria-label": "loading",
 };
+
+export const BookListUL = styled.ul({
+  listStyle: "none",
+  padding: "0",
+  display: "grid",
+  gridTemplateRows: "repeat(auto-fill, minmax(100px, 1fr))",
+  gridGap: "1em",
+});
