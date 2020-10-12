@@ -5,36 +5,23 @@ import React, { useState, useEffect } from "react";
 import "./bootstrap";
 import Tooltip from "@reach/tooltip";
 import { FaSearch, FaTimes } from "react-icons/fa";
-import { Input, BookListUL, Spinner } from "./components/lib";
-import { BookRow, Book } from "./components/BookRow";
-import { client } from "./utils/api-client";
+import { Input, BookListUL, Spinner } from "components/lib";
+import { BookRow, Book } from "components/BookRow";
+import { client } from "utils/api-client";
+import { useAsync } from "utils/hooks";
 import * as colors from "styles/colors";
 
-type Data = { books: Book[] } | null;
-type Status = "idle" | "loading" | "success";
+type Data = { books: Book[] };
 
 function DiscoverBooksScreen() {
-  const [status, setStatus] = useState<Status>("idle");
-  const [data, setData] = useState<Data>(null);
+  const { data, error, run, isLoading, isError, isSuccess } = useAsync<Data>();
   const [query, setQuery] = useState("");
   const [queried, setQueried] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (!queried) return;
-    setStatus("loading");
-    setError(null);
-    client(`books?query=${encodeURIComponent(query)}`)
-      .then(({ books }) => {
-        setData({ books });
-        setStatus("success");
-      })
-      .catch((err) => setError(err));
-  }, [queried, query]);
-
-  const isLoading = status === "loading";
-  const isSuccess = status === "success";
-  const isError = error !== null;
+    run(client(`books?query=${encodeURIComponent(query)}`));
+  }, [queried, query, run]);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
