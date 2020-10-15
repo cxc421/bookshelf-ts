@@ -19,8 +19,8 @@ try {
   // ignore json parse error
 }
 
-(window as any).__bookshelf = (window as any).__bookshelf || {};
-(window as any).__bookshelf.purgeListItems = () => {
+window.__bookshelf = window.__bookshelf || {};
+window.__bookshelf.purgeListItems = () => {
   Object.keys(listItems).forEach((key) => {
     delete listItems[key];
   });

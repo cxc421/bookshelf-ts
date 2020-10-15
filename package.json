@@ -53,6 +53,7 @@
     "@types/match-sorter": "^4.0.0",
     "@types/webpack-env": "^1.15.3",
     "cross-env": "~7.0.2",
+    "cypress": "^5.4.0",
     "msw": "^0.21.2",
     "stop-runaway-react-effects": "^2.0.0"
   }

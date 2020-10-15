@@ -17,7 +17,7 @@ import * as colors from "styles/colors";
 
 function install() {
   // add some things to window to make it easier to debug
-  (window as any).reactQuery = reactQuery;
+  window.reactQuery = reactQuery;
 
   const requireDevToolsLocal = require.context(
     "./",

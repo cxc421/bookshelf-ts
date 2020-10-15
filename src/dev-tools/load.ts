@@ -24,7 +24,7 @@ function loadDevTools(callback: () => void) {
   }
 
   // the default is off in Cypress
-  if ((window as any).Cypress) return callback();
+  if (window.Cypress) return callback();
 
   // the default is on in development
   if (process.env.NODE_ENV === "development") return go();
