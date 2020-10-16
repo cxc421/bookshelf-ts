@@ -1,66 +1,24 @@
 /** @jsx jsx */
-import { jsx } from "@emotion/core";
-import "bootstrap/dist/css/bootstrap-reboot.css";
-import "@reach/dialog/styles.css";
-import ReactDOM from "react-dom";
-import { Button } from "./components/lib";
-import { Modal, ModalContents, ModalOpenButton } from "./components/modal";
-import { Logo } from "./components/Logo";
-import { LoginForm, Props as LoginFormProps } from "./components/LoginForm";
+import {jsx} from '@emotion/core';
+
+import * as auth from 'auth-provider';
+import {AuthenticatedApp} from './authenticated-app';
+import {UnauthenticatedApp} from './unauthenticated-app';
+import {useState} from 'react';
 
 function App() {
-  const login: LoginFormProps["onSubmit"] = (formData) => {
-    console.log("login", formData);
-  };
-  const register: LoginFormProps["onSubmit"] = (formData) => {
-    console.log("register", formData);
-  };
+  const [user, setUser] = useState<auth.User | null>(null);
 
-  return (
-    <div
-      css={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Logo width="80" height="80" />
-      <h1>Bookshelf</h1>
-      <div
-        css={{
-          display: "grid",
-          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-          gridGap: "0.75rem",
-        }}
-      >
-        <Modal>
-          <ModalOpenButton>
-            <Button variant="primary">Login</Button>
-          </ModalOpenButton>
-          <ModalContents aria-label="Login Form" title="Login">
-            <LoginForm
-              onSubmit={login}
-              submitButton={<Button variant="primary">Login</Button>}
-            />
-          </ModalContents>
-        </Modal>
-        <Modal>
-          <ModalOpenButton>
-            <Button variant="secondary">Register</Button>
-          </ModalOpenButton>
-          <ModalContents aria-label="Registration form" title="Register">
-            <LoginForm
-              onSubmit={register}
-              submitButton={<Button variant="secondary">Register</Button>}
-            />
-          </ModalContents>
-        </Modal>
-      </div>
-    </div>
+  const login = (form: auth.User) => auth.login(form).then(u => setUser(u));
+  const register = (form: auth.User) =>
+    auth.register(form).then(u => setUser(u));
+  const logout = () => auth.logout().then(() => setUser(null));
+
+  return user ? (
+    <AuthenticatedApp user={user} logout={logout} />
+  ) : (
+    <UnauthenticatedApp login={login} register={register} />
   );
 }
 
-ReactDOM.render(<App />, document.getElementById("root"));
+export {App};

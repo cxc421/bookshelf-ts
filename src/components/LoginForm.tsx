@@ -1,35 +1,40 @@
 /** @jsx jsx */
-import { jsx } from "@emotion/core";
-import React, { FC, ReactElement } from "react";
-import { FormGroup, Input, Spinner } from "./lib";
+import {jsx} from '@emotion/core';
+import React, {FC, ReactElement} from 'react';
+import {ErrorMessage, FormGroup, Input, Spinner} from './lib';
+import {useAsync} from '../utils/hooks';
 
 export type Props = {
-  onSubmit: (formData: { username: string; password: string }) => void;
+  onSubmit: (formData: {username: string; password: string}) => Promise<void>;
   submitButton: ReactElement;
 };
 
-export const LoginForm: FC<Props> = ({ onSubmit, submitButton }) => {
+export const LoginForm: FC<Props> = ({onSubmit, submitButton}) => {
+  const {isLoading, isError, error, run} = useAsync();
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const { username, password } = event.currentTarget.elements as any;
+    const {username, password} = event.currentTarget.elements as any;
 
-    onSubmit({
-      username: username.value,
-      password: password.value,
-    });
+    run(
+      onSubmit({
+        username: username.value,
+        password: password.value,
+      }),
+    );
   }
 
   return (
     <form
       onSubmit={handleSubmit}
       css={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        "> div": {
-          margin: "10px auto",
-          width: "100%",
-          maxWidth: "300px",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'stretch',
+        '> div': {
+          margin: '10px auto',
+          width: '100%',
+          maxWidth: '300px',
         },
       }}
     >
@@ -43,10 +48,17 @@ export const LoginForm: FC<Props> = ({ onSubmit, submitButton }) => {
       </FormGroup>
       <div>
         <div>
-          {React.cloneElement(submitButton, { type: "submit" })}
-          <Spinner />
+          {React.cloneElement(
+            submitButton,
+            {type: 'submit'},
+            ...(Array.isArray(submitButton.props.children)
+              ? submitButton.props.children
+              : [submitButton.props.children]),
+            isLoading ? <Spinner css={{marginLeft: 5}} /> : null,
+          )}
         </div>
       </div>
+      {isError ? <ErrorMessage error={error!} /> : null}
     </form>
   );
 };
