@@ -128,3 +128,20 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
     </div>
   );
 };
+
+export function FullPageSpinner() {
+  return (
+    <div
+      css={{
+        fontSize: '4em',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Spinner />
+    </div>
+  );
+}
