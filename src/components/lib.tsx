@@ -2,6 +2,7 @@
 import {jsx} from '@emotion/core';
 
 import {FC} from 'react';
+import {Link as RouterLink} from 'react-router-dom';
 import {keyframes} from '@emotion/core';
 import styled, {CSSObject} from '@emotion/styled/macro';
 import {Dialog as ReachDialog} from '@reach/dialog';
@@ -9,6 +10,9 @@ import {FaSpinner} from 'react-icons/fa';
 import * as colors from 'styles/colors';
 import * as mq from 'styles/media-queries';
 
+/**
+ * Button
+ */
 type ButtonProps = {
   variant: 'primary' | 'secondary';
 };
@@ -34,19 +38,9 @@ export const Button = styled.button<ButtonProps>(
   ({variant}) => buttonVariants[variant],
 );
 
-export const Input = styled.input({
-  borderRadius: '3px',
-  border: `1px solid ${colors.gray10}`,
-  background: colors.gray,
-  padding: '8px 12px',
-});
-
-export const FormGroup = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-// 💰 I'm giving a few of these to you:
+/**
+ * CircleButton
+ */
 export const CircleButton = styled.button({
   borderRadius: '30px',
   padding: '0',
@@ -62,6 +56,27 @@ export const CircleButton = styled.button({
   cursor: 'pointer',
 });
 
+/**
+ * Input
+ */
+export const Input = styled.input({
+  borderRadius: '3px',
+  border: `1px solid ${colors.gray10}`,
+  background: colors.gray,
+  padding: '8px 12px',
+});
+
+/**
+ * FormGroup
+ */
+export const FormGroup = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+/**
+ * Dialog
+ */
 export const Dialog = styled(ReachDialog)({
   maxWidth: '450px',
   borderRadius: '3px',
@@ -74,6 +89,9 @@ export const Dialog = styled(ReachDialog)({
   },
 });
 
+/**
+ * Spinner
+ */
 const spin = keyframes({
   '0%': {transform: 'rotate(0deg)'},
   '100%': {transform: 'rotate(360deg)'},
@@ -87,6 +105,29 @@ Spinner.defaultProps = {
   'aria-label': 'loading',
 };
 
+/**
+ * FullPageSpinner
+ */
+export function FullPageSpinner() {
+  return (
+    <div
+      css={{
+        fontSize: '4em',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Spinner />
+    </div>
+  );
+}
+
+/**
+ * BookListUL
+ */
 export const BookListUL = styled.ul({
   listStyle: 'none',
   padding: '0',
@@ -95,6 +136,9 @@ export const BookListUL = styled.ul({
   gridGap: '1em',
 });
 
+/**
+ * ErroMessage
+ */
 type ErrorMessageProps = {
   error: Error;
   variant?: 'stacked' | 'inline';
@@ -129,19 +173,13 @@ export const ErrorMessage: FC<ErrorMessageProps> = ({
   );
 };
 
-export function FullPageSpinner() {
-  return (
-    <div
-      css={{
-        fontSize: '4em',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Spinner />
-    </div>
-  );
-}
+/**
+ * Link
+ */
+export const Link = styled(RouterLink)({
+  color: colors.indigo,
+  ':hover': {
+    color: colors.indigoDarken10,
+    textDecoration: 'underline',
+  },
+});

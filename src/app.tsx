@@ -1,10 +1,11 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-import * as auth from 'auth-provider';
-import {AuthenticatedApp} from './authenticated-app';
-import {UnauthenticatedApp} from './unauthenticated-app';
 import {useEffect} from 'react';
+import {BrowserRouter as Router} from 'react-router-dom';
+import * as auth from 'auth-provider';
+import {AuthenticatedApp} from 'authenticated-app';
+import {UnauthenticatedApp} from 'unauthenticated-app';
 import {client} from 'utils/api-client';
 import {useAsync} from 'utils/hooks';
 import {FullPageSpinner} from 'components/lib';
@@ -66,7 +67,9 @@ function App() {
 
   if (isSuccess) {
     return user ? (
-      <AuthenticatedApp user={user} logout={logout} />
+      <Router>
+        <AuthenticatedApp user={user} logout={logout} />
+      </Router>
     ) : (
       <UnauthenticatedApp login={login} register={register} />
     );
