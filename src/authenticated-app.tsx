@@ -2,7 +2,13 @@
 import { jsx } from "@emotion/core";
 
 import React, { FC } from "react";
-import { Route, Link, LinkProps, Switch } from "react-router-dom";
+import {
+  Route,
+  Link,
+  LinkProps,
+  Switch,
+  useRouteMatch,
+} from "react-router-dom";
 import { Button } from "components/lib";
 import * as mq from "styles/media-queries";
 import { User } from "auth-provider";
@@ -65,23 +71,36 @@ const AuthenticatedApp: FC<AuthenticatedAppProps> = ({ user, logout }) => {
 };
 
 function NavLink(props: LinkProps) {
+  const matches = useRouteMatch(props.to.toString());
+  // console.log({ matches });
   return (
     <Link
-      css={{
-        display: "block",
-        padding: "8px 15px 8px 10px",
-        margin: "5px 0",
-        width: "100%",
-        height: "100%",
-        color: colors.text,
-        borderRadius: "2px",
-        borderLeft: "5px solid transparent",
-        ":hover": {
-          color: colors.indigo,
-          textDecoration: "none",
-          background: colors.gray10,
+      css={[
+        {
+          display: "block",
+          padding: "8px 15px 8px 10px",
+          margin: "5px 0",
+          width: "100%",
+          height: "100%",
+          color: colors.text,
+          borderRadius: "2px",
+          borderLeft: "5px solid transparent",
+          ":hover": {
+            color: colors.indigo,
+            textDecoration: "none",
+            background: colors.gray10,
+          },
         },
-      }}
+        matches
+          ? {
+              borderLeft: `5px solid ${colors.indigo}`,
+              background: colors.gray10,
+              ":hover": {
+                background: colors.gray20,
+              },
+            }
+          : null,
+      ]}
       {...props}
     />
   );
