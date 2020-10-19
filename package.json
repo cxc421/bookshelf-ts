@@ -31,9 +31,10 @@
   },
   "scripts": {
     "start": "cross-env BROWSER=none react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build --profile",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "serve": "serve --no-clipboard --single --listen 8811 build"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -57,6 +58,7 @@
     "cross-env": "~7.0.2",
     "cypress": "^5.4.0",
     "msw": "^0.21.2",
+    "serve": "^11.3.2",
     "stop-runaway-react-effects": "^2.0.0"
   }
 }
