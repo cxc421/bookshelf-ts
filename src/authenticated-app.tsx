@@ -1,7 +1,7 @@
 /** @jsx jsx */
 import { jsx } from "@emotion/core";
 
-import React, { FC } from "react";
+import { FC } from "react";
 import {
   Route,
   Link,
@@ -9,22 +9,39 @@ import {
   Switch,
   useRouteMatch,
 } from "react-router-dom";
-import { Button } from "components/lib";
+import { Button, ErrorMessage, FullPageErrorFallback } from "components/lib";
 import * as mq from "styles/media-queries";
 import { User } from "auth-provider";
 import { DiscoverBooksScreen } from "screen/discover";
 import { BookScreen } from "screen/book";
 import { NotFoundScreen } from "screen/not-found";
 import * as colors from "styles/colors";
+import { ErrorBoundary, FallbackProps } from "react-error-boundary";
+import { ReadingListScreen } from "screen/reading-list";
+import { FinishedScreen } from "screen/finished";
+
+function ErrorFallback({ error }: FallbackProps) {
+  return (
+    <ErrorMessage
+      error={error}
+      css={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    />
+  );
+}
 
 type AuthenticatedAppProps = {
   user: User;
   logout: () => Promise<void>;
 };
-
 const AuthenticatedApp: FC<AuthenticatedAppProps> = ({ user, logout }) => {
   return (
-    <React.Fragment>
+    <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div
         css={{
           display: "flex",
@@ -63,10 +80,12 @@ const AuthenticatedApp: FC<AuthenticatedAppProps> = ({ user, logout }) => {
           <Nav />
         </div>
         <main css={{ width: "100%" }}>
-          <AppRoutes user={user} />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <AppRoutes user={user} />
+          </ErrorBoundary>
         </main>
       </div>
-    </React.Fragment>
+    </ErrorBoundary>
   );
 };
 
@@ -128,6 +147,12 @@ function Nav() {
         }}
       >
         <li>
+          <NavLink to="/list">Reading List</NavLink>
+        </li>
+        <li>
+          <NavLink to="/finished">Finished Books</NavLink>
+        </li>
+        <li>
           <NavLink to="/discover">Discover</NavLink>
         </li>
       </ul>
@@ -140,6 +165,12 @@ type AppRoutesProps = { user: User };
 function AppRoutes({ user }: AppRoutesProps) {
   return (
     <Switch>
+      <Route path="/list">
+        <ReadingListScreen user={user} />
+      </Route>
+      <Route path="/finished">
+        <FinishedScreen user={user} />
+      </Route>
       <Route path="/discover">
         <DiscoverBooksScreen user={user} />
       </Route>

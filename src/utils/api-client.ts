@@ -1,4 +1,5 @@
-import * as auth from 'auth-provider';
+import * as auth from "auth-provider";
+import { queryCache } from "react-query";
 async function client(
   endpoint: string,
   {
@@ -6,27 +7,29 @@ async function client(
     data,
     headers: customHeaders,
     ...customConfig
-  }: RequestInit & {token?: string; data?: object} = {},
+  }: RequestInit & { token?: string; data?: object } = {}
 ) {
   const response = await window.fetch(
     `${process.env.REACT_APP_API_URL}/${endpoint}`,
     {
-      method: data ? 'POST' : 'GET',
+      method: data ? "POST" : "GET",
       body: data ? JSON.stringify(data) : undefined,
       headers: {
-        ...(data ? {'Content-type': 'application/json'} : {}),
-        ...(token ? {Authorization: `Bearer ${token}`} : {}),
+        ...(data ? { "Content-type": "application/json" } : {}),
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...customHeaders,
       },
       ...customConfig,
-    },
+    }
   );
 
-  // atuo logout if
+  // auto logout if
   if (response.status === 401) {
+    queryCache.clear();
     await auth.logout();
+    // refresh page
     window.location.assign(window.location.toString());
-    return Promise.reject({message: `Please re-authenticate`});
+    return Promise.reject({ message: `Please re-authenticate` });
   }
 
   const body = await response.json();
@@ -37,4 +40,4 @@ async function client(
   }
 }
 
-export {client};
+export { client };
