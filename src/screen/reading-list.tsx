@@ -1,14 +1,14 @@
-import React from "react";
-import { Link } from "components/lib";
-import { ListItemList } from "components/list-item-list";
-import { User } from "../auth-provider";
+import React from 'react';
+import {Link} from 'components/lib';
+import {ListItemList} from 'components/ListItemList';
+import {User} from '../auth-provider';
 
-type ReadingListScreenProps = { user: User };
-function ReadingListScreen({ user }: ReadingListScreenProps) {
+type ReadingListScreenProps = {user: User};
+function ReadingListScreen({user}: ReadingListScreenProps) {
   return (
     <ListItemList
       user={user}
-      filterListItems={(li) => !li.finishDate}
+      filterListItems={li => !li.finishDate}
       noListItems={
         <p>
           Hey there! Welcome to your bookshelf reading list. Get started by
@@ -18,8 +18,8 @@ function ReadingListScreen({ user }: ReadingListScreenProps) {
       }
       noFilteredListItems={
         <p>
-          Looks like you've finished all your books! Check them out in your{" "}
-          <Link to="/finished">finished books</Link> or{" "}
+          Looks like you've finished all your books! Check them out in your{' '}
+          <Link to="/finished">finished books</Link> or{' '}
           <Link to="/discover">discover more</Link>.
         </p>
       }
@@ -27,4 +27,4 @@ function ReadingListScreen({ user }: ReadingListScreenProps) {
   );
 }
 
-export { ReadingListScreen };
+export {ReadingListScreen};

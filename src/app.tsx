@@ -1,23 +1,23 @@
 /** @jsx jsx */
-import { jsx } from "@emotion/core";
+import {jsx} from '@emotion/core';
 
-import { useEffect } from "react";
-import { BrowserRouter as Router } from "react-router-dom";
-import * as auth from "auth-provider";
-import { AuthenticatedApp } from "authenticated-app";
-import { UnauthenticatedApp } from "unauthenticated-app";
-import { client } from "utils/api-client";
-import { useAsync } from "utils/hooks";
-import { FullPageSpinner } from "components/lib";
-import * as colors from "styles/colors";
-import { queryCache } from "react-query";
+import {useEffect} from 'react';
+import {BrowserRouter as Router} from 'react-router-dom';
+import * as auth from 'auth-provider';
+import {AuthenticatedApp} from 'authenticated-app';
+import {UnauthenticatedApp} from 'unauthenticated-app';
+import {client} from 'utils/api-client';
+import {useAsync} from 'utils/hooks';
+import {FullPageSpinner} from 'components/lib';
+import * as colors from 'styles/colors';
+import {queryCache} from 'react-query';
 
 async function getUser() {
   let user: null | auth.User = null;
 
   const token = await auth.getToken();
   if (token) {
-    const data = await client("me", { token });
+    const data = await client('me', {token});
     user = data.user as auth.User;
   }
   return user;
@@ -40,11 +40,12 @@ function App() {
   }, [run]);
 
   const login = (form: auth.User) =>
-    auth.login(form).then((user) => setData(user));
+    auth.login(form).then(user => setData(user));
   const register = (form: auth.User) =>
-    auth.register(form).then((u) => setData(u));
+    auth.register(form).then(u => setData(u));
   const logout = () =>
     auth.logout().then(() => {
+      // clear query cache when logout
       queryCache.clear();
       setData(null);
     });
@@ -58,11 +59,11 @@ function App() {
       <div
         css={{
           color: colors.danger,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
         }}
       >
         <p>Uh oh... There's a problem. Try refreshing the app.</p>
@@ -84,4 +85,4 @@ function App() {
   throw new Error(`Unhandle state`);
 }
 
-export { App };
+export {App};

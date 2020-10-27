@@ -1,24 +1,24 @@
-import { MockedRequest, rest } from "msw";
-import { match } from "node-match-path";
-import * as booksDB from "test/data/books";
-import * as usersDB from "test/data/users";
-import * as listItemsDB from "test/data/list-items";
-import { DefaultRequestBodyType } from "msw/lib/types/utils/handlers/requestHandler";
-import { ResponseComposition } from "msw/lib/types/response";
-import { CustomError } from "../types";
+import {MockedRequest, rest} from 'msw';
+import {match} from 'node-match-path';
+import * as booksDB from 'test/data/books';
+import * as usersDB from 'test/data/users';
+import * as listItemsDB from 'test/data/list-items';
+import {DefaultRequestBodyType} from 'msw/lib/types/utils/handlers/requestHandler';
+import {ResponseComposition} from 'msw/lib/types/response';
+import {CustomError} from '../types';
 
 let sleep: any;
-if (process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV === 'test') {
   sleep = () => Promise.resolve();
 } else {
   sleep = (t: number = computeDefaultSleep()) =>
-    new Promise((resolve) => setTimeout(resolve, t));
+    new Promise(resolve => setTimeout(resolve, t));
 }
 
 function computeDefaultSleep() {
   return (
-    Math.random() * ls("__bookshelf_variable_request_time__", 400) +
-    ls("__bookshelf_min_request_time__", 400)
+    Math.random() * ls('__bookshelf_variable_request_time__', 400) +
+    ls('__bookshelf_min_request_time__', 400)
   );
 }
 
@@ -36,14 +36,14 @@ const authUrl = process.env.REACT_APP_AUTH_URL;
 
 const handlers = [
   rest.post(`${authUrl}/login`, async (req, res, ctx) => {
-    const { username, password } = req.body as any;
-    const user = await usersDB.authenticate({ username, password });
-    return res(ctx.json({ user }));
+    const {username, password} = req.body as any;
+    const user = await usersDB.authenticate({username, password});
+    return res(ctx.json({user}));
   }),
 
   rest.post(`${authUrl}/register`, async (req, res, ctx) => {
-    const { username, password } = req.body as any;
-    const userFields = { username, password };
+    const {username, password} = req.body as any;
+    const userFields = {username, password};
     await usersDB.create(userFields);
     let user;
     try {
@@ -51,16 +51,16 @@ const handlers = [
     } catch (error) {
       return res(
         ctx.status(400),
-        ctx.json({ status: 400, message: error.message })
+        ctx.json({status: 400, message: error.message}),
       );
     }
-    return res(ctx.json({ user }));
+    return res(ctx.json({user}));
   }),
 
   rest.get(`${apiUrl}/me`, async (req, res, ctx) => {
     const user = await getUser(req);
     const token = getToken(req);
-    return res(ctx.json({ user: { ...user, token } }));
+    return res(ctx.json({user: {...user, token}}));
   }),
 
   rest.get(`${apiUrl}/bootstrap`, async (req, res, ctx) => {
@@ -68,21 +68,21 @@ const handlers = [
     const token = getToken(req);
     const lis = await listItemsDB.readByOwner(user.id);
     const listItemsAndBooks = await Promise.all(
-      lis.map(async (listItem) => ({
+      lis.map(async listItem => ({
         ...listItem,
         book: await booksDB.read(listItem.bookId),
-      }))
+      })),
     );
     return res(
-      ctx.json({ user: { ...user, token }, listItems: listItemsAndBooks })
+      ctx.json({user: {...user, token}, listItems: listItemsAndBooks}),
     );
   }),
 
   rest.get(`${apiUrl}/books`, async (req, res, ctx) => {
-    if (!req.url.searchParams.has("query")) {
+    if (!req.url.searchParams.has('query')) {
       return ctx.fetch(req);
     }
-    const query = req.url.searchParams.get("query");
+    const query = req.url.searchParams.get('query');
 
     let matchingBooks = [];
     if (query) {
@@ -99,77 +99,77 @@ const handlers = [
       }
     }
 
-    return res(ctx.json({ books: matchingBooks }));
+    return res(ctx.json({books: matchingBooks}));
   }),
 
   rest.get(`${apiUrl}/books/:bookId`, async (req, res, ctx) => {
-    const { bookId } = req.params;
+    const {bookId} = req.params;
     const book = await booksDB.read(bookId);
     if (!book) {
       return res(
         ctx.status(404),
-        ctx.json({ status: 404, message: "Book not found" })
+        ctx.json({status: 404, message: 'Book not found'}),
       );
     }
-    return res(ctx.json({ book }));
+    return res(ctx.json({book}));
   }),
 
   rest.get(`${apiUrl}/list-items`, async (req, res, ctx) => {
     const user = await getUser(req);
     const lis = await listItemsDB.readByOwner(user.id);
     const listItemsAndBooks = await Promise.all(
-      lis.map(async (listItem) => ({
+      lis.map(async listItem => ({
         ...listItem,
         book: await booksDB.read(listItem.bookId),
-      }))
+      })),
     );
-    return res(ctx.json({ listItems: listItemsAndBooks }));
+    return res(ctx.json({listItems: listItemsAndBooks}));
   }),
 
   rest.post(`${apiUrl}/list-items`, async (req, res, ctx) => {
     const user = await getUser(req);
-    const { bookId } = req.body as any;
+    const {bookId} = req.body as any;
     const listItem = await listItemsDB.create({
       ownerId: user.id,
       bookId: bookId,
     });
     const book = await booksDB.read(bookId);
-    return res(ctx.json({ listItem: { ...listItem, book } }));
+    return res(ctx.json({listItem: {...listItem, book}}));
   }),
 
   rest.put(`${apiUrl}/list-items/:listItemId`, async (req, res, ctx) => {
     const user = await getUser(req);
-    const { listItemId } = req.params;
+    const {listItemId} = req.params;
     const updates = req.body;
     await listItemsDB.authorize(user.id, listItemId);
     const updatedListItem = await listItemsDB.update(listItemId, updates);
     const book = await booksDB.read(updatedListItem.bookId);
-    return res(ctx.json({ listItem: { ...updatedListItem, book } }));
+    return res(ctx.json({listItem: {...updatedListItem, book}}));
   }),
 
   rest.delete(`${apiUrl}/list-items/:listItemId`, async (req, res, ctx) => {
     const user = await getUser(req);
-    const { listItemId } = req.params;
+    const {listItemId} = req.params;
     await listItemsDB.authorize(user.id, listItemId);
     await listItemsDB.remove(listItemId);
-    return res(ctx.json({ success: true }));
+    return res(ctx.json({success: true}));
   }),
 
   rest.post(`${apiUrl}/profile`, async (req, res, ctx) => {
     // here's where we'd actually send the report to some real data store.
-    return res(ctx.json({ success: true }));
+    return res(ctx.json({success: true}));
   }),
-].map((handler) => {
+].map(handler => {
   return {
     ...handler,
     async resolver(
       req: MockedRequest<DefaultRequestBodyType>,
       res: ResponseComposition<any>,
-      ctx: any
+      ctx: any,
     ) {
       try {
         if (shouldFail(req)) {
-          throw new Error("Request failure (for testing purposes).");
+          throw new Error('Request failure (for testing purposes).');
         }
         const result = await handler.resolver(req, res, ctx);
         return result;
@@ -177,7 +177,7 @@ const handlers = [
         const status = error.status || 500;
         return res(
           ctx.status(status),
-          ctx.json({ status, message: error.message || "Unknown Error" })
+          ctx.json({status, message: error.message || 'Unknown Error'}),
         );
       } finally {
         await sleep();
@@ -187,11 +187,11 @@ const handlers = [
 });
 
 function shouldFail(req: MockedRequest<DefaultRequestBodyType>) {
-  if (JSON.stringify(req.body)?.includes("FAIL")) return true;
-  if (req.url.searchParams.toString()?.includes("FAIL")) return true;
-  if (process.env.NODE_ENV === "test") return false;
+  if (JSON.stringify(req.body)?.includes('FAIL')) return true;
+  if (req.url.searchParams.toString()?.includes('FAIL')) return true;
+  if (process.env.NODE_ENV === 'test') return false;
   const failureRate = Number(
-    window.localStorage.getItem("__bookshelf_failure_rate__") || 0
+    window.localStorage.getItem('__bookshelf_failure_rate__') || 0,
   );
   if (Math.random() < failureRate) return true;
   if (requestMatchesFailConfig(req)) return true;
@@ -200,30 +200,30 @@ function shouldFail(req: MockedRequest<DefaultRequestBodyType>) {
 }
 
 function requestMatchesFailConfig(req: MockedRequest<DefaultRequestBodyType>) {
-  function configMatches({ requestMethod = "", urlMatch = "" }) {
+  function configMatches({requestMethod = '', urlMatch = ''}) {
     return (
-      (requestMethod === "ALL" || req.method === requestMethod) &&
+      (requestMethod === 'ALL' || req.method === requestMethod) &&
       match(urlMatch, req.url.pathname).matches
     );
   }
   try {
     const failConfig = JSON.parse(
-      window.localStorage.getItem("__bookshelf_request_fail_config__") || "[]"
+      window.localStorage.getItem('__bookshelf_request_fail_config__') || '[]',
     );
     if (failConfig.some(configMatches)) return true;
   } catch (error) {
-    window.localStorage.removeItem("__bookshelf_request_fail_config__");
+    window.localStorage.removeItem('__bookshelf_request_fail_config__');
   }
   return false;
 }
 
 const getToken = (req: MockedRequest<DefaultRequestBodyType>) =>
-  req.headers.get("Authorization")?.replace("Bearer ", "");
+  req.headers.get('Authorization')?.replace('Bearer ', '');
 
 async function getUser(req: MockedRequest<DefaultRequestBodyType>) {
   const token = getToken(req);
   if (!token) {
-    const error: CustomError = new Error("A token must be provided");
+    const error: CustomError = new Error('A token must be provided');
     error.status = 401;
     throw error;
   }
@@ -231,7 +231,7 @@ async function getUser(req: MockedRequest<DefaultRequestBodyType>) {
   try {
     userId = atob(token);
   } catch (e) {
-    const error: CustomError = new Error("Invalid token. Please login again.");
+    const error: CustomError = new Error('Invalid token. Please login again.');
     error.status = 401;
     throw error;
   }
@@ -241,10 +241,10 @@ async function getUser(req: MockedRequest<DefaultRequestBodyType>) {
 
 async function getBooksNotInUsersList(userId: string) {
   const bookIdsInUsersList = (await listItemsDB.readByOwner(userId)).map(
-    (li) => li.bookId
+    li => li.bookId,
   );
   const books = await booksDB.readManyNotInList(bookIdsInUsersList);
   return books;
 }
 
-export { handlers };
+export {handlers};

@@ -1,4 +1,4 @@
-import * as reactQuery from "react-query";
+import * as reactQuery from 'react-query';
 
 declare global {
   interface Window {

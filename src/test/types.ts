@@ -1,4 +1,4 @@
-export type CustomError = { status?: number } & Error;
+export type CustomError = {status?: number} & Error;
 
 export type Book = {
   title: string;

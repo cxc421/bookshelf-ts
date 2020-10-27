@@ -2,12 +2,22 @@
 import {jsx} from '@emotion/core';
 
 import React, {FC} from 'react';
+import Tooltip from '@reach/tooltip';
+import {FaRegCalendarAlt} from 'react-icons/fa';
+import debounceFn from 'debounce-fn';
 import {useParams} from 'react-router-dom';
-import {client} from 'utils/api-client';
-import * as mq from 'styles/media-queries';
-import {useAsync} from 'utils/hooks';
-import bookPlaceholderSvg from 'assets/book-placeholder.svg';
 import {User} from 'auth-provider';
+import {useQuery, useMutation, queryCache} from 'react-query';
+import * as mq from 'styles/media-queries';
+import * as colors from 'styles/colors';
+import {Book} from 'components/BookRow';
+import {StatusButtons} from 'components/StatusButtons';
+import {Rating} from 'components/Rating';
+import {Textarea} from 'components/lib';
+import {client} from 'utils/api-client';
+import {formatDate} from 'utils/misc';
+import bookPlaceholderSvg from 'assets/book-placeholder.svg';
+import {ListItem} from 'test/types';
 
 const loadingBook = {
   title: 'Loading...',
@@ -23,12 +33,23 @@ type BookScreenProps = {user: User};
 
 const BookScreen: FC<BookScreenProps> = ({user}) => {
   const {bookId} = useParams<BookScreenParams>();
-  const {data, run} = useAsync();
+  const {data} = useQuery<{book: Book}, Error>({
+    queryKey: ['book', {bookId}],
+    queryFn: (key: string, {bookId}: BookScreenParams) =>
+      client(`books/${bookId}`, {token: user.token}),
+  });
 
-  React.useEffect(() => {
-    run(client(`books/${bookId}`, {token: user.token}));
-  }, [run, bookId, user.token]);
+  const {data: listItems} = useQuery<ListItem[], Error>({
+    queryKey: 'list-items',
+    queryFn: (key: string) =>
+      client(key, {
+        token: user.token,
+      }).then(data => data.listItems),
+  });
+  const listItem = listItems?.find(item => item.bookId === bookId);
 
+  const bookIsLoading = typeof data === 'undefined';
+  const book = data?.book;
   const {title, author, coverImageUrl, publisher, synopsis} =
     data?.book ?? loadingBook;
 
@@ -61,13 +82,114 @@ const BookScreen: FC<BookScreenProps> = ({user}) => {
                 <i>{publisher}</i>
               </div>
             </div>
+            <div
+              css={{
+                right: 0,
+                color: colors.gray80,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-around',
+                minHeight: 100,
+              }}
+            >
+              {bookIsLoading ? null : (
+                <StatusButtons user={user} book={book!} />
+              )}
+            </div>
+          </div>
+          <div css={{marginTop: 10, height: 46}}>
+            {listItem?.finishDate ? (
+              <Rating user={user} listItem={listItem} />
+            ) : null}
+            {listItem ? <ListItemTimeframe listItem={listItem} /> : null}
           </div>
           <br />
           <p>{synopsis}</p>
         </div>
       </div>
+      {!bookIsLoading && listItem ? (
+        <NotesTextarea user={user} listItem={listItem} />
+      ) : null}
     </div>
   );
 };
+
+type ListItemTimeframeProps = {listItem: ListItem};
+function ListItemTimeframe({listItem}: ListItemTimeframeProps) {
+  const timeframeLabel = listItem.finishDate
+    ? 'Start and finish date'
+    : 'Start date';
+
+  return (
+    <Tooltip label={timeframeLabel}>
+      <div aria-label={timeframeLabel} css={{marginTop: 6}}>
+        <FaRegCalendarAlt css={{marginTop: -2, marginRight: 5}} />
+        <span>
+          {formatDate(listItem.startDate)}{' '}
+          {listItem.finishDate ? `— ${formatDate(listItem.finishDate)}` : null}
+        </span>
+      </div>
+    </Tooltip>
+  );
+}
+
+type NotesTextareaProps = {listItem: ListItem; user: User};
+function NotesTextarea({listItem, user}: NotesTextareaProps) {
+  // 🐨 call useMutation here
+  // the mutate function should call the list-items/:listItemId endpoint with a PUT
+  //   and the updates as data. The mutate function will be called with the updates
+  //   you can pass as data.
+  // 💰 if you want to get the list-items cache updated after this query finishes
+  // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
+  // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  const [mutate] = useMutation<unknown, Error, Partial<ListItem>>(
+    (data: Partial<ListItem>) =>
+      client(`list-items/${listItem.id}`, {
+        token: user.token,
+        method: 'PUT',
+        data,
+      }),
+    {
+      onSettled() {
+        queryCache.invalidateQueries('list-items');
+      },
+    },
+  );
+
+  const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
+    mutate,
+  ]);
+
+  function handleNotesChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    debouncedMutate({id: listItem.id, notes: e.target.value});
+  }
+
+  return (
+    <React.Fragment>
+      <div>
+        <label
+          htmlFor="notes"
+          css={{
+            display: 'inline-block',
+            marginRight: 10,
+            marginTop: '0',
+            marginBottom: '0.5rem',
+            fontWeight: 'bold',
+          }}
+        >
+          Notes
+        </label>
+      </div>
+      <Textarea
+        id="notes"
+        defaultValue={listItem.notes}
+        onChange={handleNotesChange}
+        css={{width: '100%', minHeight: 300}}
+      />
+    </React.Fragment>
+  );
+}
 
 export {BookScreen};

@@ -1,6 +1,6 @@
-import { CustomError } from "../types";
-const usersKey = "__bookshelf_users__";
-type User = { [key: string]: any };
+import {CustomError} from '../types';
+const usersKey = '__bookshelf_users__';
+type User = {[key: string]: any};
 let users: User = {};
 const persist = () =>
   window.localStorage.setItem(usersKey, JSON.stringify(users));
@@ -17,49 +17,49 @@ try {
 
 window.__bookshelf = window.__bookshelf || {};
 window.__bookshelf.purgeUsers = () => {
-  Object.keys(users).forEach((key) => {
+  Object.keys(users).forEach(key => {
     delete users[key];
   });
   persist();
 };
 
-function validateUserForm({ username = "", password = "" }) {
+function validateUserForm({username = '', password = ''}) {
   if (!username) {
-    const error: CustomError = new Error("A username is required");
+    const error: CustomError = new Error('A username is required');
     error.status = 400;
     throw error;
   }
   if (!password) {
-    const error: CustomError = new Error("A password is required");
+    const error: CustomError = new Error('A password is required');
     error.status = 400;
     throw error;
   }
 }
 
-async function authenticate({ username = "", password = "" }) {
-  validateUserForm({ username, password });
+async function authenticate({username = '', password = ''}) {
+  validateUserForm({username, password});
   const id = hash(username);
   const user = users[id] || {};
   if (user.passwordHash === hash(password)) {
-    return { ...sanitizeUser(user), token: btoa(user.id) };
+    return {...sanitizeUser(user), token: btoa(user.id)};
   }
-  const error: CustomError = new Error("Invalid username or password");
+  const error: CustomError = new Error('Invalid username or password');
   error.status = 400;
   throw error;
 }
 
-async function create({ username = "", password = "" }) {
-  validateUserForm({ username, password });
+async function create({username = '', password = ''}) {
+  validateUserForm({username, password});
   const id = hash(username);
   const passwordHash = hash(password);
   if (users[id]) {
     const error: CustomError = new Error(
-      `Cannot create a new user with the username "${username}"`
+      `Cannot create a new user with the username "${username}"`,
     );
     error.status = 400;
     throw error;
   }
-  users[id] = { id, username, passwordHash };
+  users[id] = {id, username, passwordHash};
   persist();
   return read(id);
 }
@@ -70,7 +70,7 @@ async function read(id: string) {
 }
 
 function sanitizeUser(user: User) {
-  const { passwordHash, ...rest } = user;
+  const {passwordHash, ...rest} = user;
   return rest;
 }
 
@@ -112,4 +112,4 @@ async function reset() {
   persist();
 }
 
-export { authenticate, create, read, update, remove, reset };
+export {authenticate, create, read, update, remove, reset};

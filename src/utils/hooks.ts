@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 function useSafeDispatch(dispatch: React.Dispatch<any>) {
   const mounted = React.useRef(false);
@@ -10,7 +10,7 @@ function useSafeDispatch(dispatch: React.Dispatch<any>) {
   }, []);
   return React.useCallback(
     (arg: any) => (mounted.current ? dispatch(arg) : void 0),
-    [dispatch]
+    [dispatch],
   );
 }
 
@@ -20,50 +20,50 @@ function useSafeDispatch(dispatch: React.Dispatch<any>) {
 //   run(fetchPokemon(pokemonName))
 // }, [pokemonName, run])
 type AsyncState<T> =
-  | { status: "idle"; data: null; error: null }
-  | { status: "pending"; data: null; error: null }
-  | { status: "resolved"; data: T; error: null }
-  | { status: "rejected"; data: null; error: Error };
+  | {status: 'idle'; data: null; error: null}
+  | {status: 'pending'; data: null; error: null}
+  | {status: 'resolved'; data: T; error: null}
+  | {status: 'rejected'; data: null; error: Error};
 
 const defaultInitialState = {
-  status: "idle",
+  status: 'idle',
   data: null,
   error: null,
 };
 function useAsync<T = any>(
-  initialState: AsyncState<T> = { status: "idle", data: null, error: null }
+  initialState: AsyncState<T> = {status: 'idle', data: null, error: null},
 ) {
   const initialStateRef = React.useRef({
     ...defaultInitialState,
     ...initialState,
   });
-  const [{ status, data, error }, setState] = React.useReducer(
-    (s: AsyncState<T>, a: AsyncState<T>) => ({ ...s, ...a }),
-    initialStateRef.current
+  const [{status, data, error}, setState] = React.useReducer(
+    (s: AsyncState<T>, a: AsyncState<T>) => ({...s, ...a}),
+    initialStateRef.current,
   );
 
   const safeSetState = useSafeDispatch(setState);
 
   const setData = React.useCallback(
-    (data) => safeSetState({ data, status: "resolved" }),
-    [safeSetState]
+    data => safeSetState({data, status: 'resolved'}),
+    [safeSetState],
   );
   const setError = React.useCallback(
-    (error) => safeSetState({ error, status: "rejected" }),
-    [safeSetState]
+    error => safeSetState({error, status: 'rejected'}),
+    [safeSetState],
   );
   const reset = React.useCallback(() => safeSetState(initialStateRef.current), [
     safeSetState,
   ]);
 
   const run = React.useCallback(
-    (promise) => {
+    promise => {
       if (!promise || !promise.then) {
         throw new Error(
-          `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`
+          `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`,
         );
       }
-      safeSetState({ status: "pending" });
+      safeSetState({status: 'pending'});
       return promise.then(
         (data: T) => {
           setData(data);
@@ -72,18 +72,18 @@ function useAsync<T = any>(
         (error: Error) => {
           setError(error);
           return Promise.reject(error);
-        }
+        },
       );
     },
-    [safeSetState, setData, setError]
+    [safeSetState, setData, setError],
   );
 
   return {
     // using the same names that react-query uses for convenience
-    isIdle: status === "idle",
-    isLoading: status === "pending",
-    isError: status === "rejected",
-    isSuccess: status === "resolved",
+    isIdle: status === 'idle',
+    isLoading: status === 'pending',
+    isError: status === 'rejected',
+    isSuccess: status === 'resolved',
 
     setData,
     setError,
@@ -95,4 +95,4 @@ function useAsync<T = any>(
   };
 }
 
-export { useAsync };
+export {useAsync};

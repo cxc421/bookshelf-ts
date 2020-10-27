@@ -1,46 +1,46 @@
 /** @jsx jsx */
-import { jsx } from "@emotion/core";
+import {jsx} from '@emotion/core';
 
-import React, { useState, FC } from "react";
-import Tooltip from "@reach/tooltip";
-import { FaSearch, FaTimes } from "react-icons/fa";
-import { Input, BookListUL, Spinner } from "components/lib";
-import { BookRow, Book } from "components/BookRow";
-import { client } from "utils/api-client";
-import * as colors from "styles/colors";
-import { User } from "auth-provider";
-import bookPlaceholderSvg from "assets/book-placeholder.svg";
-import { useQuery } from "react-query";
+import React, {useState, FC} from 'react';
+import Tooltip from '@reach/tooltip';
+import {FaSearch, FaTimes} from 'react-icons/fa';
+import {Input, BookListUL, Spinner} from 'components/lib';
+import {BookRow, Book} from 'components/BookRow';
+import {client} from 'utils/api-client';
+import * as colors from 'styles/colors';
+import {User} from 'auth-provider';
+import bookPlaceholderSvg from 'assets/book-placeholder.svg';
+import {useQuery} from 'react-query';
 
 const loadingBook = {
-  title: "Loading...",
-  author: "loading...",
+  title: 'Loading...',
+  author: 'loading...',
   coverImageUrl: bookPlaceholderSvg,
-  publisher: "Loading Publishing",
-  synopsis: "Loading...",
+  publisher: 'Loading Publishing',
+  synopsis: 'Loading...',
   loadingBook: true,
 };
 
-const loadingBooks = Array.from({ length: 10 }, (v, index) => ({
+const loadingBooks = Array.from({length: 10}, (v, index) => ({
   id: `loading-book-${index}`,
   ...loadingBook,
 }));
 
-type Data = { books: Book[] };
+type Data = {books: Book[]};
 
 type DiscoverBooksScreenProps = {
   user: User;
 };
 
-const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({ user }) => {
-  const [query, setQuery] = useState("");
+const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({user}) => {
+  // query: Save search input text
+  const [query, setQuery] = useState('');
+  // queried: Determine user search at least one time or not. Show some welcome message
   const [queried, setQueried] = useState(false);
-  const { data, error, isLoading, isError, isSuccess } = useQuery<
-    Book[],
-    Error
-  >({
-    queryKey: ["bookSearch", { query }],
-    queryFn: (_key: string, { query }: { query: string }) =>
+  // query
+  const {data, error, isLoading, isError, isSuccess} = useQuery<Book[], Error>({
+    queryKey: ['bookSearch', {query}],
+    queryFn: (_key: string, {query}: {query: string}) =>
       client(`books?query=${encodeURIComponent(query)}`, {
         token: user.token,
       }).then((data: Data) => data.books),
@@ -52,7 +52,7 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({ user }) => {
     event.preventDefault();
     setQueried(true);
     const searchInput = event.currentTarget.elements.namedItem(
-      "search"
+      'search',
     ) as HTMLInputElement;
     setQuery(searchInput.value);
   }
@@ -60,24 +60,26 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({ user }) => {
   return (
     <div>
       <form onSubmit={handleSearchSubmit}>
+        {/* Search Input */}
         <Input
           placeholder="Search books..."
           id="search"
-          css={{ width: "100%" }}
+          css={{width: '100%'}}
         />
+        {/* Search Input Button */}
         <Tooltip label="Search Books">
           <label htmlFor="search">
             <button
               type="submit"
               css={{
-                border: "0",
-                position: "relative",
-                marginLeft: "-35px",
-                background: "transparent",
+                border: '0',
+                position: 'relative',
+                marginLeft: '-35px',
+                background: 'transparent',
               }}
             >
               {isError ? (
-                <FaTimes aria-label="error" css={{ color: colors.danger }} />
+                <FaTimes aria-label="error" css={{color: colors.danger}} />
               ) : isLoading ? (
                 <Spinner />
               ) : (
@@ -87,21 +89,21 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({ user }) => {
           </label>
         </Tooltip>
       </form>
-
+      {/* Error Messages Area  */}
       {isError ? (
-        <div css={{ color: colors.danger }}>
+        <div css={{color: colors.danger}}>
           <p>There was an error:</p>
           <pre>{error?.message}</pre>
         </div>
       ) : null}
-
+      {/* Welcome Messages */}
       <div>
         {queried ? null : (
-          <div css={{ marginTop: 20, fontSize: "1.2em", textAlign: "center" }}>
+          <div css={{marginTop: 20, fontSize: '1.2em', textAlign: 'center'}}>
             <p>Welcome to the discover page.</p>
             <p>Here, let me load a few books for you...</p>
             {isLoading ? (
-              <div css={{ width: "100%", margin: "auto" }}>
+              <div css={{width: '100%', margin: 'auto'}}>
                 <Spinner />
               </div>
             ) : isSuccess && books.length ? (
@@ -114,11 +116,11 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({ user }) => {
           </div>
         )}
       </div>
-
+      {/* Book List */}
       {isSuccess ? (
         books.length ? (
-          <BookListUL css={{ marginTop: 20 }}>
-            {books.map((book) => (
+          <BookListUL css={{marginTop: 20}}>
+            {books.map(book => (
               <li key={book.id}>
                 <BookRow user={user} key={book.id} book={book} />
               </li>
@@ -132,4 +134,4 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({ user }) => {
   );
 };
 
-export { DiscoverBooksScreen };
+export {DiscoverBooksScreen};

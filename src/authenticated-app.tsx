@@ -1,85 +1,64 @@
 /** @jsx jsx */
-import { jsx } from "@emotion/core";
+import {jsx} from '@emotion/core';
 
-import { FC } from "react";
-import {
-  Route,
-  Link,
-  LinkProps,
-  Switch,
-  useRouteMatch,
-} from "react-router-dom";
-import { Button, ErrorMessage, FullPageErrorFallback } from "components/lib";
-import * as mq from "styles/media-queries";
-import { User } from "auth-provider";
-import { DiscoverBooksScreen } from "screen/discover";
-import { BookScreen } from "screen/book";
-import { NotFoundScreen } from "screen/not-found";
-import * as colors from "styles/colors";
-import { ErrorBoundary, FallbackProps } from "react-error-boundary";
-import { ReadingListScreen } from "screen/reading-list";
-import { FinishedScreen } from "screen/finished";
-
-function ErrorFallback({ error }: FallbackProps) {
-  return (
-    <ErrorMessage
-      error={error}
-      css={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    />
-  );
-}
+import {FC} from 'react';
+import {Route, Link, LinkProps, Switch, useRouteMatch} from 'react-router-dom';
+import {Button, ErrorMessage, FullPageErrorFallback} from 'components/lib';
+import * as mq from 'styles/media-queries';
+import {User} from 'auth-provider';
+import {DiscoverBooksScreen} from 'screen/discover';
+import {BookScreen} from 'screen/book';
+import {NotFoundScreen} from 'screen/not-found';
+import * as colors from 'styles/colors';
+import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
+import {ReadingListScreen} from 'screen/reading-list';
+import {FinishedScreen} from 'screen/finished';
 
 type AuthenticatedAppProps = {
   user: User;
   logout: () => Promise<void>;
 };
-const AuthenticatedApp: FC<AuthenticatedAppProps> = ({ user, logout }) => {
+const AuthenticatedApp: FC<AuthenticatedAppProps> = ({user, logout}) => {
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
+      {/* Logout Button */}
       <div
         css={{
-          display: "flex",
-          alignItems: "center",
-          position: "absolute",
-          top: "10px",
-          right: "10px",
+          display: 'flex',
+          alignItems: 'center',
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
         }}
       >
         {user.username}
-        <Button
-          variant="secondary"
-          css={{ marginLeft: "10px" }}
-          onClick={logout}
-        >
+        <Button variant="secondary" css={{marginLeft: '10px'}} onClick={logout}>
           Logout
         </Button>
       </div>
+      {/* Main Area */}
       <div
         css={{
-          margin: "0 auto",
-          padding: "4em 2em",
-          maxWidth: "840px",
-          width: "100%",
-          display: "grid",
-          gridGap: "1em",
-          gridTemplateColumns: "1fr 3fr",
+          margin: '0 auto',
+          padding: '4em 2em',
+          maxWidth: '840px',
+          width: '100%',
+          display: 'grid',
+          gridGap: '1em',
+          gridTemplateColumns: '1fr 3fr',
           [mq.small]: {
-            gridTemplateColumns: "1fr",
-            gridTemplateRows: "auto",
-            width: "100%",
+            gridTemplateColumns: '1fr',
+            gridTemplateRows: 'auto',
+            width: '100%',
           },
         }}
       >
-        <div css={{ position: "relative" }}>
+        {/* Nav Buttons Area */}
+        <div css={{position: 'relative'}}>
           <Nav />
         </div>
-        <main css={{ width: "100%" }}>
+        {/* Main Area */}
+        <main css={{width: '100%'}}>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <AppRoutes user={user} />
           </ErrorBoundary>
@@ -89,61 +68,25 @@ const AuthenticatedApp: FC<AuthenticatedAppProps> = ({ user, logout }) => {
   );
 };
 
-function NavLink(props: LinkProps) {
-  const matches = useRouteMatch(props.to.toString());
-  // console.log({ matches });
-  return (
-    <Link
-      css={[
-        {
-          display: "block",
-          padding: "8px 15px 8px 10px",
-          margin: "5px 0",
-          width: "100%",
-          height: "100%",
-          color: colors.text,
-          borderRadius: "2px",
-          borderLeft: "5px solid transparent",
-          ":hover": {
-            color: colors.indigo,
-            textDecoration: "none",
-            background: colors.gray10,
-          },
-        },
-        matches
-          ? {
-              borderLeft: `5px solid ${colors.indigo}`,
-              background: colors.gray10,
-              ":hover": {
-                background: colors.gray20,
-              },
-            }
-          : null,
-      ]}
-      {...props}
-    />
-  );
-}
-
 function Nav() {
   return (
     <nav
       css={{
-        position: "sticky",
-        top: "4px",
-        padding: "1em 1.5em",
+        position: 'sticky',
+        top: '4px',
+        padding: '1em 1.5em',
         border: `1px solid ${colors.gray10}`,
-        borderRadius: "3px",
+        borderRadius: '3px',
         [mq.small]: {
-          position: "static",
-          top: "auto",
+          position: 'static',
+          top: 'auto',
         },
       }}
     >
       <ul
         css={{
-          listStyle: "none",
-          padding: "0",
+          listStyle: 'none',
+          padding: '0',
         }}
       >
         <li>
@@ -160,9 +103,45 @@ function Nav() {
   );
 }
 
-type AppRoutesProps = { user: User };
+function NavLink(props: LinkProps) {
+  const matches = useRouteMatch(props.to.toString());
+  // console.log({ matches });
+  return (
+    <Link
+      css={[
+        {
+          display: 'block',
+          padding: '8px 15px 8px 10px',
+          margin: '5px 0',
+          width: '100%',
+          height: '100%',
+          color: colors.text,
+          borderRadius: '2px',
+          borderLeft: '5px solid transparent',
+          ':hover': {
+            color: colors.indigo,
+            textDecoration: 'none',
+            background: colors.gray10,
+          },
+        },
+        matches
+          ? {
+              borderLeft: `5px solid ${colors.indigo}`,
+              background: colors.gray10,
+              ':hover': {
+                background: colors.gray20,
+              },
+            }
+          : null,
+      ]}
+      {...props}
+    />
+  );
+}
 
-function AppRoutes({ user }: AppRoutesProps) {
+type AppRoutesProps = {user: User};
+
+function AppRoutes({user}: AppRoutesProps) {
   return (
     <Switch>
       <Route path="/list">
@@ -184,4 +163,19 @@ function AppRoutes({ user }: AppRoutesProps) {
   );
 }
 
-export { AuthenticatedApp };
+function ErrorFallback({error}: FallbackProps) {
+  return (
+    <ErrorMessage
+      error={error}
+      css={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    />
+  );
+}
+
+export {AuthenticatedApp};

@@ -1,16 +1,16 @@
 /** @jsx jsx */
-import { jsx } from "@emotion/core";
+import {jsx} from '@emotion/core';
 
-import { FC } from "react";
-import { Link } from "react-router-dom";
-import * as mq from "styles/media-queries";
-import * as colors from "styles/colors";
-import { User } from "../auth-provider";
-import { useQuery } from "react-query";
-import { client } from "utils/api-client";
-import { Rating } from "./Rating";
-import { ListItem } from "test/types";
-import { StatusButtons } from "./StatusButtons";
+import {FC} from 'react';
+import {Link} from 'react-router-dom';
+import * as mq from 'styles/media-queries';
+import * as colors from 'styles/colors';
+import {User} from '../auth-provider';
+import {useQuery} from 'react-query';
+import {client} from 'utils/api-client';
+import {Rating} from './Rating';
+import {ListItem} from 'test/types';
+import {StatusButtons} from './StatusButtons';
 
 export type Book = {
   title: string;
@@ -26,28 +26,27 @@ type Props = {
   user: User;
 };
 
-export const BookRow: FC<Props> = ({ book, user }) => {
-  const { title, author, coverImageUrl } = book;
+export const BookRow: FC<Props> = ({book, user}) => {
+  const {title, author, coverImageUrl} = book;
 
-  const { data } = useQuery<{ listItems: ListItem[] }, Error>({
-    queryKey: "list-items",
+  const {data: listItems} = useQuery<ListItem[], Error>({
+    queryKey: 'list-items',
     queryFn: (key: string) =>
       client(key, {
         token: user.token,
-      }),
+      }).then(data => data.listItems),
   });
-
-  const listItem = data?.listItems.find((item) => item.id === book.id);
+  const listItem = listItems?.find(item => item.bookId === book.id);
 
   const id = `book-row-book-${book.id}`;
 
   return (
     <div
       css={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end",
-        position: "relative",
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        position: 'relative',
       }}
     >
       <Link
@@ -56,17 +55,17 @@ export const BookRow: FC<Props> = ({ book, user }) => {
         css={{
           minHeight: 270,
           flexGrow: 2,
-          display: "grid",
-          gridTemplateColumns: "140px 1fr",
+          display: 'grid',
+          gridTemplateColumns: '140px 1fr',
           gridGap: 20,
           border: `1px solid ${colors.gray20}`,
           color: colors.text,
-          padding: "1.25em",
-          borderRadius: "3px",
-          ":hover,:focus": {
-            textDecoration: "none",
-            boxShadow: "0 5px 15px -5px rgba(0,0,0,.08)",
-            color: "inherit",
+          padding: '1.25em',
+          borderRadius: '3px',
+          ':hover,:focus': {
+            textDecoration: 'none',
+            boxShadow: '0 5px 15px -5px rgba(0,0,0,.08)',
+            color: 'inherit',
           },
         }}
       >
@@ -81,17 +80,17 @@ export const BookRow: FC<Props> = ({ book, user }) => {
           <img
             src={coverImageUrl}
             alt={`${title} book cover`}
-            css={{ maxHeight: "100%", width: "100%" }}
+            css={{maxHeight: '100%', width: '100%'}}
           />
         </div>
-        <div css={{ flex: 1 }}>
-          <div css={{ display: "flex", justifyContent: "space-between" }}>
-            <div css={{ flex: 1 }}>
+        <div css={{flex: 1}}>
+          <div css={{display: 'flex', justifyContent: 'space-between'}}>
+            <div css={{flex: 1}}>
               <h2
                 id={id}
                 css={{
-                  fontSize: "1.25em",
-                  margin: "0",
+                  fontSize: '1.25em',
+                  margin: '0',
                   color: colors.indigo,
                 }}
               >
@@ -101,12 +100,12 @@ export const BookRow: FC<Props> = ({ book, user }) => {
                 <Rating user={user} listItem={listItem} />
               ) : null}
             </div>
-            <div css={{ marginLeft: 10 }}>
+            <div css={{marginLeft: 10}}>
               <div
                 css={{
-                  marginTop: "0.4em",
-                  fontStyle: "italic",
-                  fontSize: "0.85em",
+                  marginTop: '0.4em',
+                  fontStyle: 'italic',
+                  fontSize: '0.85em',
                 }}
               >
                 {author}
@@ -114,20 +113,20 @@ export const BookRow: FC<Props> = ({ book, user }) => {
               <small>{book.publisher}</small>
             </div>
           </div>
-          <small css={{ whiteSpace: "break-spaces", display: "block" }}>
+          <small css={{whiteSpace: 'break-spaces', display: 'block'}}>
             {book.synopsis.substring(0, 500)}...
           </small>
         </div>
       </Link>
       <div
         css={{
-          marginLeft: "20px",
-          position: "absolute",
+          marginLeft: '20px',
+          position: 'absolute',
           color: colors.gray80,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-          height: "100%",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-around',
+          height: '100%',
         }}
       >
         <StatusButtons user={user} book={book} />
