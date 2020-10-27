@@ -2,13 +2,11 @@
 import {jsx, InterpolationWithTheme} from '@emotion/core';
 
 import React, {FC} from 'react';
-// 🐨 you'll need useMutation and queryCache from react-query
-// 🐨 you'll also need the client from utils/api-client
+import {useMutation, queryCache} from 'react-query';
+import {client} from 'utils/api-client';
 import {FaStar} from 'react-icons/fa';
 import * as colors from 'styles/colors';
 import {User} from '../auth-provider';
-import {useMutation, queryCache} from 'react-query';
-import {client} from 'utils/api-client';
 import {ListItem} from 'test/types';
 
 const visuallyHiddenCSS: InterpolationWithTheme<any> = {
@@ -29,27 +27,17 @@ type Props = {
 
 const Rating: FC<Props> = ({listItem, user}) => {
   const [isTabbing, setIsTabbing] = React.useState(false);
-  // 🐨 call useMutation here and call the function "update"
-  // the mutate function should call the list-items/:listItemId endpoint with a PUT
-  //   and the updates as data. The mutate function will be called with the updates
-  //   you can pass as data.
-  // 💰 if you want to get the list-items cache updated after this query finishes
-  // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
 
-  const update = ({id, rating}: UpdateArgs) =>
-    client(`list-items/${id}`, {
-      method: 'PUT',
-      token: user.token,
-      data: {
-        rating,
-      },
-    });
-  const [mutate] = useMutation<any, Error, UpdateArgs>(update, {
-    onSettled() {
-      queryCache.invalidateQueries('list-items');
-    },
-  });
+  type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
+  const [updateListItem] = useMutation<any, Error, UpdateArgs>(
+    ({id, rating}: UpdateArgs) =>
+      client(`list-items/${id}`, {
+        method: 'PUT',
+        token: user.token,
+        data: {rating},
+      }),
+    {onSettled: () => queryCache.invalidateQueries('list-items')},
+  );
 
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -75,7 +63,7 @@ const Rating: FC<Props> = ({listItem, user}) => {
           value={ratingValue}
           checked={ratingValue === listItem.rating}
           onChange={() => {
-            mutate({id: listItem.id, rating: ratingValue});
+            updateListItem({id: listItem.id, rating: ratingValue});
           }}
           css={[
             visuallyHiddenCSS,
