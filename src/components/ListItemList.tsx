@@ -24,19 +24,11 @@ const ListItemList: FC<ListItemListProps> = ({
   noListItems,
   noFilteredListItems,
 }) => {
-  // 🐨 call useQuery to get the list-items from the 'list-items' endpoint
-  // queryKey should be 'list-items'
-  // queryFn should call the 'list-items' endpoint
   const {data: listItems} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
     queryFn: (key: string) =>
-      client(key, {
-        token: user.token,
-      }).then(data => data.listItems),
+      client(key, {token: user.token}).then(data => data.listItems),
   });
-
-  // 🐨 assign this to the list items you get back from react-query
-  // const listItems = data?.listItems;
 
   const filteredListItems = listItems?.filter(filterListItems);
 
