@@ -25,6 +25,7 @@ async function client(
 
   // auto logout if
   if (response.status === 401) {
+    // clear cache
     queryCache.clear();
     await auth.logout();
     // refresh page
