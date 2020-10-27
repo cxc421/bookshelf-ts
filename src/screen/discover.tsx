@@ -33,11 +33,11 @@ type DiscoverBooksScreenProps = {
 };
 
 const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({user}) => {
-  // query: Save search input text
+  // query: Search input text
   const [query, setQuery] = useState('');
-  // queried: Determine user search at least one time or not. Show some welcome message
+  // queried: Determine user sumbut seach at least one time or not. Show some welcome message
   const [queried, setQueried] = useState(false);
-  // query
+  // query cache
   const {data, error, isLoading, isError, isSuccess} = useQuery<Book[], Error>({
     queryKey: ['bookSearch', {query}],
     queryFn: (_key: string, {query}: {query: string}) =>
