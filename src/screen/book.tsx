@@ -33,25 +33,21 @@ type BookScreenProps = {user: User};
 
 const BookScreen: FC<BookScreenProps> = ({user}) => {
   const {bookId} = useParams<BookScreenParams>();
-  const {data} = useQuery<{book: Book}, Error>({
+  const {data: book} = useQuery<Book, Error>({
     queryKey: ['book', {bookId}],
     queryFn: (key: string, {bookId}: BookScreenParams) =>
-      client(`books/${bookId}`, {token: user.token}),
+      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
   });
+  const bookIsLoading = typeof book === 'undefined';
+  const {title, author, coverImageUrl, publisher, synopsis} =
+    book ?? loadingBook;
 
   const {data: listItems} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
     queryFn: (key: string) =>
-      client(key, {
-        token: user.token,
-      }).then(data => data.listItems),
+      client(key, {token: user.token}).then(data => data.listItems),
   });
   const listItem = listItems?.find(item => item.bookId === bookId);
-
-  const bookIsLoading = typeof data === 'undefined';
-  const book = data?.book;
-  const {title, author, coverImageUrl, publisher, synopsis} =
-    data?.book ?? loadingBook;
 
   return (
     <div>
@@ -135,15 +131,6 @@ function ListItemTimeframe({listItem}: ListItemTimeframeProps) {
 
 type NotesTextareaProps = {listItem: ListItem; user: User};
 function NotesTextarea({listItem, user}: NotesTextareaProps) {
-  // 🐨 call useMutation here
-  // the mutate function should call the list-items/:listItemId endpoint with a PUT
-  //   and the updates as data. The mutate function will be called with the updates
-  //   you can pass as data.
-  // 💰 if you want to get the list-items cache updated after this query finishes
-  // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  // 💣 DELETE THIS ESLINT IGNORE!! Don't ignore the exhaustive deps rule please
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-
   const [mutate] = useMutation<unknown, Error, Partial<ListItem>>(
     (data: Partial<ListItem>) =>
       client(`list-items/${listItem.id}`, {
@@ -151,11 +138,7 @@ function NotesTextarea({listItem, user}: NotesTextareaProps) {
         method: 'PUT',
         data,
       }),
-    {
-      onSettled() {
-        queryCache.invalidateQueries('list-items');
-      },
-    },
+    {onSettled: () => queryCache.invalidateQueries('list-items')},
   );
 
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
