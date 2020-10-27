@@ -29,6 +29,7 @@ type Props = {
 export const BookRow: FC<Props> = ({book, user}) => {
   const {title, author, coverImageUrl} = book;
 
+  // Query List Items
   const {data: listItems} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
     queryFn: (key: string) =>
