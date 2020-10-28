@@ -26,7 +26,7 @@ type Props = {
 
 const Rating: FC<Props> = ({listItem, user}) => {
   const [isTabbing, setIsTabbing] = React.useState(false);
-  const updateListItem = useUpdateListItem(user);
+  const [updateListItem] = useUpdateListItem(user);
 
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {

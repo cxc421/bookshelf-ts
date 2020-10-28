@@ -73,9 +73,9 @@ type StatusButtonsProps = {
 
 const StatusButtons: FC<StatusButtonsProps> = ({user, book}) => {
   const listItem = useListItem(user, book.id);
-  const updateListItem = useUpdateListItem(user);
-  const removeListItem = useRemoveListItem(user);
-  const createListItem = useCreateListItem(user);
+  const [updateListItem] = useUpdateListItem(user);
+  const [removeListItem] = useRemoveListItem(user);
+  const [createListItem] = useCreateListItem(user);
 
   return (
     <React.Fragment>

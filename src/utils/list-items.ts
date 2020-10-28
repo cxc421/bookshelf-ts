@@ -24,31 +24,25 @@ const defaultMutationOptions = {
 export function useUpdateListItem(user: User) {
   type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
 
-  const [updateListItem] = useMutation(
+  return useMutation(
     (data: UpdateArgs) =>
       client(`list-items/${data.id}`, {method: 'PUT', token: user.token, data}),
     defaultMutationOptions,
   );
-
-  return updateListItem;
 }
 
 export function useRemoveListItem(user: User) {
-  const [removeListItem] = useMutation(
+  return useMutation(
     ({id}: Pick<ListItem, 'id'>) =>
       client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
     defaultMutationOptions,
   );
-
-  return removeListItem;
 }
 
 export function useCreateListItem(user: User) {
-  const [createListItem] = useMutation(
+  return useMutation(
     ({bookId}: Pick<ListItem, 'bookId'>) =>
       client(`list-items`, {method: 'POST', token: user.token, data: {bookId}}),
     defaultMutationOptions,
   );
-
-  return createListItem;
 }
