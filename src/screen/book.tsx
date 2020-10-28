@@ -7,16 +7,15 @@ import {FaRegCalendarAlt} from 'react-icons/fa';
 import debounceFn from 'debounce-fn';
 import {useParams} from 'react-router-dom';
 import {User} from 'auth-provider';
-import {useQuery, useMutation, queryCache} from 'react-query';
 import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
 import {StatusButtons} from 'components/StatusButtons';
 import {Rating} from 'components/Rating';
 import {Textarea} from 'components/lib';
-import {client} from 'utils/api-client';
 import {formatDate} from 'utils/misc';
 import {ListItem} from 'types/listItemTypes';
 import {useBook} from 'utils/books';
+import {useListItem, useUpdateListItem} from 'utils/list-items';
 
 type BookScreenParams = {bookId: string};
 type BookScreenProps = {user: User};
@@ -24,14 +23,8 @@ type BookScreenProps = {user: User};
 const BookScreen: FC<BookScreenProps> = ({user}) => {
   const {bookId} = useParams<BookScreenParams>();
   const book = useBook(bookId, user);
+  const listItem = useListItem(user, bookId);
   const {title, author, coverImageUrl, publisher, synopsis} = book;
-
-  const {data: listItems} = useQuery<ListItem[], Error>({
-    queryKey: 'list-items',
-    queryFn: (key: string) =>
-      client(key, {token: user.token}).then(data => data.listItems),
-  });
-  const listItem = listItems?.find(item => item.bookId === bookId);
 
   return (
     <div>
@@ -115,20 +108,10 @@ function ListItemTimeframe({listItem}: ListItemTimeframeProps) {
 
 type NotesTextareaProps = {listItem: ListItem; user: User};
 function NotesTextarea({listItem, user}: NotesTextareaProps) {
-  const [mutate] = useMutation<unknown, Error, Partial<ListItem>>(
-    (data: Partial<ListItem>) =>
-      client(`list-items/${listItem.id}`, {
-        token: user.token,
-        method: 'PUT',
-        data,
-      }),
-    {onSettled: () => queryCache.invalidateQueries('list-items')},
-  );
-
+  const mutate = useUpdateListItem(user);
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ]);
-
   function handleNotesChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     debouncedMutate({id: listItem.id, notes: e.target.value});
   }

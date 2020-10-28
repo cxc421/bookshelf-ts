@@ -6,12 +6,10 @@ import {Link} from 'react-router-dom';
 import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
 import {User} from '../auth-provider';
-import {useQuery} from 'react-query';
-import {client} from 'utils/api-client';
 import {Rating} from './Rating';
-import {ListItem} from 'types/listItemTypes';
 import {StatusButtons} from './StatusButtons';
 import {Book} from 'types/bookTypes';
+import {useListItem} from 'utils/list-items';
 
 type Props = {
   book: Book;
@@ -22,14 +20,7 @@ export const BookRow: FC<Props> = ({book, user}) => {
   const {title, author, coverImageUrl} = book;
 
   // Query List Items
-  const {data: listItems} = useQuery<ListItem[], Error>({
-    queryKey: 'list-items',
-    queryFn: (key: string) =>
-      client(key, {
-        token: user.token,
-      }).then(data => data.listItems),
-  });
-  const listItem = listItems?.find(item => item.bookId === book.id);
+  const listItem = useListItem(user, book.id);
 
   const id = `book-row-book-${book.id}`;
 

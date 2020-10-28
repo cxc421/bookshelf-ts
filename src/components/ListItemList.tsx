@@ -6,8 +6,7 @@ import {BookRow} from './BookRow';
 import {User} from 'auth-provider';
 import {ListItem} from 'types/listItemTypes';
 import {ReactElement, FC} from 'react';
-import {useQuery} from 'react-query';
-import {client} from 'utils/api-client';
+import {useListItems} from 'utils/list-items';
 
 type ListItemListProps = {
   user: User;
@@ -22,11 +21,7 @@ const ListItemList: FC<ListItemListProps> = ({
   noListItems,
   noFilteredListItems,
 }) => {
-  const {data: listItems} = useQuery<ListItem[], Error>({
-    queryKey: 'list-items',
-    queryFn: (key: string) =>
-      client(key, {token: user.token}).then(data => data.listItems),
-  });
+  const listItems = useListItems(user);
 
   const filteredListItems = listItems?.filter(filterListItems);
 

@@ -2,11 +2,10 @@
 import {jsx, InterpolationWithTheme} from '@emotion/core';
 
 import React, {FC} from 'react';
-import {useMutation, queryCache} from 'react-query';
-import {client} from 'utils/api-client';
+import {useUpdateListItem} from 'utils/list-items';
 import {FaStar} from 'react-icons/fa';
 import * as colors from 'styles/colors';
-import {User} from '../auth-provider';
+import {User} from 'auth-provider';
 import {ListItem} from 'types/listItemTypes';
 
 const visuallyHiddenCSS: InterpolationWithTheme<any> = {
@@ -27,17 +26,7 @@ type Props = {
 
 const Rating: FC<Props> = ({listItem, user}) => {
   const [isTabbing, setIsTabbing] = React.useState(false);
-
-  type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
-  const [updateListItem] = useMutation<any, Error, UpdateArgs>(
-    ({id, rating}: UpdateArgs) =>
-      client(`list-items/${id}`, {
-        method: 'PUT',
-        token: user.token,
-        data: {rating},
-      }),
-    {onSettled: () => queryCache.invalidateQueries('list-items')},
-  );
+  const updateListItem = useUpdateListItem(user);
 
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
