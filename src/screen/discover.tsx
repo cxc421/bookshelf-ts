@@ -5,28 +5,10 @@ import React, {useState, FC} from 'react';
 import Tooltip from '@reach/tooltip';
 import {FaSearch, FaTimes} from 'react-icons/fa';
 import {Input, BookListUL, Spinner} from 'components/lib';
-import {BookRow, Book} from 'components/BookRow';
-import {client} from 'utils/api-client';
+import {BookRow} from 'components/BookRow';
 import * as colors from 'styles/colors';
 import {User} from 'auth-provider';
-import bookPlaceholderSvg from 'assets/book-placeholder.svg';
-import {useQuery} from 'react-query';
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-};
-
-const loadingBooks = Array.from({length: 10}, (v, index) => ({
-  id: `loading-book-${index}`,
-  ...loadingBook,
-}));
-
-type Data = {books: Book[]};
+import {useBookSearch} from 'utils/books';
 
 type DiscoverBooksScreenProps = {
   user: User;
@@ -38,15 +20,10 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({user}) => {
   // queried: Determine user sumbut seach at least one time or not. Show some welcome message
   const [queried, setQueried] = useState(false);
   // query cache
-  const {data, error, isLoading, isError, isSuccess} = useQuery<Book[], Error>({
-    queryKey: ['bookSearch', {query}],
-    queryFn: (_key: string, {query}: {query: string}) =>
-      client(`books?query=${encodeURIComponent(query)}`, {
-        token: user.token,
-      }).then((data: Data) => data.books),
-  });
-
-  const books = data ?? loadingBooks;
+  const {books, error, isLoading, isError, isSuccess} = useBookSearch(
+    query,
+    user,
+  );
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

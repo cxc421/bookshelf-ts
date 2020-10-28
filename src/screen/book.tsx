@@ -10,37 +10,21 @@ import {User} from 'auth-provider';
 import {useQuery, useMutation, queryCache} from 'react-query';
 import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
-import {Book} from 'components/BookRow';
 import {StatusButtons} from 'components/StatusButtons';
 import {Rating} from 'components/Rating';
 import {Textarea} from 'components/lib';
 import {client} from 'utils/api-client';
 import {formatDate} from 'utils/misc';
-import bookPlaceholderSvg from 'assets/book-placeholder.svg';
-import {ListItem} from 'test/types';
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-};
+import {ListItem} from 'types/listItemTypes';
+import {useBook} from 'utils/books';
 
 type BookScreenParams = {bookId: string};
 type BookScreenProps = {user: User};
 
 const BookScreen: FC<BookScreenProps> = ({user}) => {
   const {bookId} = useParams<BookScreenParams>();
-  const {data: book} = useQuery<Book, Error>({
-    queryKey: ['book', {bookId}],
-    queryFn: (key: string, {bookId}: BookScreenParams) =>
-      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
-  });
-  const bookIsLoading = typeof book === 'undefined';
-  const {title, author, coverImageUrl, publisher, synopsis} =
-    book ?? loadingBook;
+  const book = useBook(bookId, user);
+  const {title, author, coverImageUrl, publisher, synopsis} = book;
 
   const {data: listItems} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
@@ -88,8 +72,8 @@ const BookScreen: FC<BookScreenProps> = ({user}) => {
                 minHeight: 100,
               }}
             >
-              {bookIsLoading ? null : (
-                <StatusButtons user={user} book={book!} />
+              {book.loadingBook ? null : (
+                <StatusButtons user={user} book={book} />
               )}
             </div>
           </div>
@@ -103,7 +87,7 @@ const BookScreen: FC<BookScreenProps> = ({user}) => {
           <p>{synopsis}</p>
         </div>
       </div>
-      {!bookIsLoading && listItem ? (
+      {!book.loadingBook && listItem ? (
         <NotesTextarea user={user} listItem={listItem} />
       ) : null}
     </div>

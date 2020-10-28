@@ -1,12 +1,10 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-// 🐨 you'll need useQuery from 'react-query'
-// 🐨 and client from 'utils/api-client'
 import {BookListUL} from './lib';
 import {BookRow} from './BookRow';
 import {User} from 'auth-provider';
-import {ListItem} from 'test/types';
+import {ListItem} from 'types/listItemTypes';
 import {ReactElement, FC} from 'react';
 import {useQuery} from 'react-query';
 import {client} from 'utils/api-client';

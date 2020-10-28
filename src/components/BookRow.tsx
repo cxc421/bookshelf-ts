@@ -9,17 +9,9 @@ import {User} from '../auth-provider';
 import {useQuery} from 'react-query';
 import {client} from 'utils/api-client';
 import {Rating} from './Rating';
-import {ListItem} from 'test/types';
+import {ListItem} from 'types/listItemTypes';
 import {StatusButtons} from './StatusButtons';
-
-export type Book = {
-  title: string;
-  author: string;
-  coverImageUrl: string;
-  id: string;
-  publisher: string;
-  synopsis: string;
-};
+import {Book} from 'types/bookTypes';
 
 type Props = {
   book: Book;

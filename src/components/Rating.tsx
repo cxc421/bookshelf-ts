@@ -7,7 +7,7 @@ import {client} from 'utils/api-client';
 import {FaStar} from 'react-icons/fa';
 import * as colors from 'styles/colors';
 import {User} from '../auth-provider';
-import {ListItem} from 'test/types';
+import {ListItem} from 'types/listItemTypes';
 
 const visuallyHiddenCSS: InterpolationWithTheme<any> = {
   border: '0',

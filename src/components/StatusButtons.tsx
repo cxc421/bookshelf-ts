@@ -16,8 +16,8 @@ import {useAsync} from 'utils/hooks';
 import * as colors from 'styles/colors';
 import {CircleButton, Spinner} from './lib';
 import {User} from '../auth-provider';
-import {Book} from './BookRow';
-import {ListItem} from 'test/types';
+import {Book} from 'types/bookTypes';
+import {ListItem} from 'types/listItemTypes';
 
 type TooltipButtonProps = {
   label: string;
