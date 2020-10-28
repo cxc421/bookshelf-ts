@@ -36,10 +36,14 @@ const TooltipButton: FC<TooltipButtonProps> = ({
   icon,
   ...rest
 }) => {
-  const {isLoading, isError, error, run} = useAsync();
+  const {isLoading, isError, error, run, reset} = useAsync();
 
   function handleClick() {
-    run(onClick());
+    if (isError) {
+      reset();
+    } else {
+      run(onClick());
+    }
   }
 
   return (
@@ -73,9 +77,9 @@ type StatusButtonsProps = {
 
 const StatusButtons: FC<StatusButtonsProps> = ({user, book}) => {
   const listItem = useListItem(user, book.id);
-  const [updateListItem] = useUpdateListItem(user);
-  const [removeListItem] = useRemoveListItem(user);
-  const [createListItem] = useCreateListItem(user);
+  const [updateListItem] = useUpdateListItem(user, {throwOnError: true});
+  const [removeListItem] = useRemoveListItem(user, {throwOnError: true});
+  const [createListItem] = useCreateListItem(user, {throwOnError: true});
 
   return (
     <React.Fragment>

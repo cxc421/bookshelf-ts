@@ -6,14 +6,15 @@ import Tooltip from '@reach/tooltip';
 import {FaRegCalendarAlt} from 'react-icons/fa';
 import debounceFn from 'debounce-fn';
 import {useParams} from 'react-router-dom';
+
+import {ListItem} from 'types/listItemTypes';
 import {User} from 'auth-provider';
 import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
 import {StatusButtons} from 'components/StatusButtons';
 import {Rating} from 'components/Rating';
-import {Textarea} from 'components/lib';
+import {Textarea, ErrorMessage} from 'components/lib';
 import {formatDate} from 'utils/misc';
-import {ListItem} from 'types/listItemTypes';
 import {useBook} from 'utils/books';
 import {useListItem, useUpdateListItem} from 'utils/list-items';
 
@@ -108,7 +109,7 @@ function ListItemTimeframe({listItem}: ListItemTimeframeProps) {
 
 type NotesTextareaProps = {listItem: ListItem; user: User};
 function NotesTextarea({listItem, user}: NotesTextareaProps) {
-  const [mutate] = useUpdateListItem(user);
+  const [mutate, {error, isError}] = useUpdateListItem(user);
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ]);
@@ -131,6 +132,13 @@ function NotesTextarea({listItem, user}: NotesTextareaProps) {
         >
           Notes
         </label>
+        {isError ? (
+          <ErrorMessage
+            error={error!}
+            variant="inline"
+            css={{marginLeft: 6, fontSize: '0.7em'}}
+          />
+        ) : null}
       </div>
       <Textarea
         id="notes"

@@ -1,5 +1,5 @@
 import {User} from 'auth-provider';
-import {useQuery, useMutation, queryCache} from 'react-query';
+import {useQuery, useMutation, queryCache, MutationConfig} from 'react-query';
 import {ListItem} from 'types/listItemTypes';
 import {client} from 'utils/api-client';
 
@@ -21,28 +21,40 @@ const defaultMutationOptions = {
   onSettled: () => queryCache.invalidateQueries('list-items'),
 };
 
-export function useUpdateListItem(user: User) {
-  type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
-
-  return useMutation(
+type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
+export function useUpdateListItem(
+  user: User,
+  config?: MutationConfig<any, Error, UpdateArgs, unknown> | undefined,
+) {
+  return useMutation<any, Error, UpdateArgs>(
     (data: UpdateArgs) =>
       client(`list-items/${data.id}`, {method: 'PUT', token: user.token, data}),
-    defaultMutationOptions,
+    {...defaultMutationOptions, ...config},
   );
 }
 
-export function useRemoveListItem(user: User) {
+export function useRemoveListItem(
+  user: User,
+  config?:
+    | MutationConfig<any, Error, Pick<ListItem, 'id'>, unknown>
+    | undefined,
+) {
   return useMutation(
     ({id}: Pick<ListItem, 'id'>) =>
       client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
-    defaultMutationOptions,
+    {...defaultMutationOptions, ...config},
   );
 }
 
-export function useCreateListItem(user: User) {
+export function useCreateListItem(
+  user: User,
+  config?:
+    | MutationConfig<any, Error, Pick<ListItem, 'bookId'>, unknown>
+    | undefined,
+) {
   return useMutation(
     ({bookId}: Pick<ListItem, 'bookId'>) =>
       client(`list-items`, {method: 'POST', token: user.token, data: {bookId}}),
-    defaultMutationOptions,
+    {...defaultMutationOptions, ...config},
   );
 }

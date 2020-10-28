@@ -7,6 +7,7 @@ import {FaStar} from 'react-icons/fa';
 import * as colors from 'styles/colors';
 import {User} from 'auth-provider';
 import {ListItem} from 'types/listItemTypes';
+import {ErrorMessage} from 'components/lib';
 
 const visuallyHiddenCSS: InterpolationWithTheme<any> = {
   border: '0',
@@ -26,7 +27,7 @@ type Props = {
 
 const Rating: FC<Props> = ({listItem, user}) => {
   const [isTabbing, setIsTabbing] = React.useState(false);
-  const [updateListItem] = useUpdateListItem(user);
+  const [updateListItem, {error, isError}] = useUpdateListItem(user);
 
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -106,6 +107,13 @@ const Rating: FC<Props> = ({listItem, user}) => {
       }}
     >
       <span css={{display: 'flex'}}>{stars}</span>
+      {isError ? (
+        <ErrorMessage
+          error={error!}
+          variant="inline"
+          css={{marginLeft: 6, fontSize: '0.7em'}}
+        />
+      ) : null}
     </div>
   );
 };
