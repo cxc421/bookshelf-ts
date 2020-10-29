@@ -2,12 +2,19 @@ import {User} from 'auth-provider';
 import {useQuery, useMutation, queryCache, MutationConfig} from 'react-query';
 import {ListItem} from 'types/listItemTypes';
 import {client} from 'utils/api-client';
+import {setQueryDataForBook} from './books';
 
 export function useListItems(user: User) {
   const {data} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
     queryFn: (key: string) =>
       client(key, {token: user.token}).then(data => data.listItems),
+    config: {
+      onSuccess: (listItems: ListItem[]) =>
+        listItems.forEach(({book, bookId}) =>
+          setQueryDataForBook(bookId, book),
+        ),
+    },
   });
   return data ?? [];
 }
