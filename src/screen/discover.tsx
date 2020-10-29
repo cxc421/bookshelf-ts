@@ -1,14 +1,14 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-import React, {useState, FC} from 'react';
+import React, {useState, FC, useEffect} from 'react';
 import Tooltip from '@reach/tooltip';
 import {FaSearch, FaTimes} from 'react-icons/fa';
 import {Input, BookListUL, Spinner} from 'components/lib';
 import {BookRow} from 'components/BookRow';
 import * as colors from 'styles/colors';
 import {User} from 'auth-provider';
-import {useBookSearch} from 'utils/books';
+import {useBookSearch, refetchBookSearchQuery} from 'utils/books';
 
 type DiscoverBooksScreenProps = {
   user: User;
@@ -24,6 +24,8 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({user}) => {
     query,
     user,
   );
+
+  useEffect(() => () => refetchBookSearchQuery(user), [user]);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
