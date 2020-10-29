@@ -13,7 +13,7 @@ import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
 import {StatusButtons} from 'components/StatusButtons';
 import {Rating} from 'components/Rating';
-import {Textarea, ErrorMessage} from 'components/lib';
+import {Textarea, ErrorMessage, Spinner} from 'components/lib';
 import {formatDate} from 'utils/misc';
 import {useBook} from 'utils/books';
 import {useListItem, useUpdateListItem} from 'utils/list-items';
@@ -109,7 +109,7 @@ function ListItemTimeframe({listItem}: ListItemTimeframeProps) {
 
 type NotesTextareaProps = {listItem: ListItem; user: User};
 function NotesTextarea({listItem, user}: NotesTextareaProps) {
-  const [mutate, {error, isError}] = useUpdateListItem(user);
+  const [mutate, {error, isError, isLoading}] = useUpdateListItem(user);
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ]);
@@ -132,7 +132,9 @@ function NotesTextarea({listItem, user}: NotesTextareaProps) {
         >
           Notes
         </label>
-        {isError ? (
+        {isLoading ? (
+          <Spinner />
+        ) : isError ? (
           <ErrorMessage
             error={error!}
             variant="inline"
