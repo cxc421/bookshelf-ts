@@ -7,25 +7,18 @@ import {FaSearch, FaTimes} from 'react-icons/fa';
 import {Input, BookListUL, Spinner} from 'components/lib';
 import {BookRow} from 'components/BookRow';
 import * as colors from 'styles/colors';
-import {User} from 'auth-provider';
-import {useBookSearch, refetchBookSearchQuery} from 'utils/books';
+import {useBookSearch, useRefetchBookSearchQuery} from 'utils/books';
 
-type DiscoverBooksScreenProps = {
-  user: User;
-};
-
-const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({user}) => {
+const DiscoverBooksScreen: FC = () => {
   // query: Search input text
   const [query, setQuery] = useState('');
   // queried: Determine user sumbut seach at least one time or not. Show some welcome message
   const [queried, setQueried] = useState(false);
   // query cache
-  const {books, error, isLoading, isError, isSuccess} = useBookSearch(
-    query,
-    user,
-  );
+  const {books, error, isLoading, isError, isSuccess} = useBookSearch(query);
+  const refetchBookSearchQuery = useRefetchBookSearchQuery();
 
-  useEffect(() => () => refetchBookSearchQuery(user), [user]);
+  useEffect(() => () => refetchBookSearchQuery(), [refetchBookSearchQuery]);
 
   function handleSearchSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -101,7 +94,7 @@ const DiscoverBooksScreen: FC<DiscoverBooksScreenProps> = ({user}) => {
           <BookListUL css={{marginTop: 20}}>
             {books.map(book => (
               <li key={book.id}>
-                <BookRow user={user} key={book.id} book={book} />
+                <BookRow key={book.id} book={book} />
               </li>
             ))}
           </BookListUL>

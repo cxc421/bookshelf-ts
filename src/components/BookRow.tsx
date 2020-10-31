@@ -5,7 +5,6 @@ import {FC} from 'react';
 import {Link} from 'react-router-dom';
 import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
-import {User} from '../auth-provider';
 import {Rating} from './Rating';
 import {StatusButtons} from './StatusButtons';
 import {Book} from 'types/bookTypes';
@@ -13,14 +12,13 @@ import {useListItem} from 'utils/list-items';
 
 type Props = {
   book: Book;
-  user: User;
 };
 
-export const BookRow: FC<Props> = ({book, user}) => {
+export const BookRow: FC<Props> = ({book}) => {
   const {title, author, coverImageUrl} = book;
 
   // Query List Items
-  const listItem = useListItem(user, book.id);
+  const listItem = useListItem(book.id);
 
   const id = `book-row-book-${book.id}`;
 
@@ -80,9 +78,7 @@ export const BookRow: FC<Props> = ({book, user}) => {
               >
                 {title}
               </h2>
-              {listItem?.finishDate ? (
-                <Rating user={user} listItem={listItem} />
-              ) : null}
+              {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
             </div>
             <div css={{marginLeft: 10}}>
               <div
@@ -113,7 +109,7 @@ export const BookRow: FC<Props> = ({book, user}) => {
           height: '100%',
         }}
       >
-        <StatusButtons user={user} book={book} />
+        <StatusButtons book={book} />
       </div>
     </div>
   );

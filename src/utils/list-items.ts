@@ -1,14 +1,16 @@
-import {User} from 'auth-provider';
+import {useContext} from 'react';
+import {AuthContext} from 'context/auth-context';
 import {useQuery, useMutation, queryCache, MutationConfig} from 'react-query';
 import {ListItem} from 'types/listItemTypes';
 import {client} from 'utils/api-client';
 import {setQueryDataForBook} from './books';
 
-export function useListItems(user: User) {
+export function useListItems() {
+  const {user} = useContext(AuthContext);
   const {data} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
     queryFn: (key: string) =>
-      client(key, {token: user.token}).then(data => data.listItems),
+      client(key, {token: user?.token}).then(data => data.listItems),
     config: {
       onSuccess: (listItems: ListItem[]) =>
         listItems.forEach(({book, bookId}) =>
@@ -19,8 +21,8 @@ export function useListItems(user: User) {
   return data ?? [];
 }
 
-export function useListItem(user: User, bookId: string) {
-  const listItems = useListItems(user);
+export function useListItem(bookId: string) {
+  const listItems = useListItems();
   return listItems.find(item => item.bookId === bookId);
 }
 
@@ -41,14 +43,18 @@ const defaultMutationOptions: MutationConfig<
 type UpdateArgs = Partial<ListItem> & Pick<ListItem, 'id'>;
 
 export function useUpdateListItem(
-  user: User,
   config?:
     | MutationConfig<any, Error, UpdateArgs, Function | undefined>
     | undefined,
 ) {
+  const {user} = useContext(AuthContext);
   return useMutation<any, Error, UpdateArgs, Function | undefined>(
     (data: UpdateArgs) =>
-      client(`list-items/${data.id}`, {method: 'PUT', token: user.token, data}),
+      client(`list-items/${data.id}`, {
+        method: 'PUT',
+        token: user?.token,
+        data,
+      }),
     {
       onMutate(data) {
         const listItems = queryCache.getQueryData<ListItem[]>('list-items');
@@ -68,14 +74,14 @@ export function useUpdateListItem(
 }
 
 export function useRemoveListItem(
-  user: User,
   config?:
     | MutationConfig<any, Error, Pick<ListItem, 'id'>, Function | undefined>
     | undefined,
 ) {
+  const {user} = useContext(AuthContext);
   return useMutation<any, Error, Pick<ListItem, 'id'>, Function | undefined>(
     ({id}: Pick<ListItem, 'id'>) =>
-      client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
+      client(`list-items/${id}`, {method: 'DELETE', token: user?.token}),
     {
       onMutate(data) {
         const listItems = queryCache.getQueryData<ListItem[]>('list-items');
@@ -93,11 +99,11 @@ export function useRemoveListItem(
 }
 
 export function useCreateListItem(
-  user: User,
   config?:
     | MutationConfig<any, Error, Pick<ListItem, 'bookId'>, Function | undefined>
     | undefined,
 ) {
+  const {user} = useContext(AuthContext);
   return useMutation<
     any,
     Error,
@@ -105,7 +111,11 @@ export function useCreateListItem(
     Function | undefined
   >(
     ({bookId}: Pick<ListItem, 'bookId'>) =>
-      client(`list-items`, {method: 'POST', token: user.token, data: {bookId}}),
+      client(`list-items`, {
+        method: 'POST',
+        token: user?.token,
+        data: {bookId},
+      }),
     {...defaultMutationOptions, ...config},
   );
 }

@@ -1,13 +1,10 @@
 import React from 'react';
 import {Link} from 'components/lib';
 import {ListItemList} from 'components/ListItemList';
-import {User} from '../auth-provider';
 
-type ReadingListScreenProps = {user: User};
-function ReadingListScreen({user}: ReadingListScreenProps) {
+function ReadingListScreen() {
   return (
     <ListItemList
-      user={user}
       filterListItems={li => !li.finishDate}
       noListItems={
         <p>

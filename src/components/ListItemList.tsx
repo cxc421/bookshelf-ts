@@ -3,25 +3,22 @@ import {jsx} from '@emotion/core';
 
 import {BookListUL} from './lib';
 import {BookRow} from './BookRow';
-import {User} from 'auth-provider';
 import {ListItem} from 'types/listItemTypes';
 import {ReactElement, FC} from 'react';
 import {useListItems} from 'utils/list-items';
 
 type ListItemListProps = {
-  user: User;
   filterListItems: (listTem: ListItem) => boolean;
   noListItems: ReactElement;
   noFilteredListItems: ReactElement;
 };
 
 const ListItemList: FC<ListItemListProps> = ({
-  user,
   filterListItems,
   noListItems,
   noFilteredListItems,
 }) => {
-  const listItems = useListItems(user);
+  const listItems = useListItems();
 
   const filteredListItems = listItems?.filter(filterListItems);
 
@@ -40,7 +37,7 @@ const ListItemList: FC<ListItemListProps> = ({
     <BookListUL>
       {filteredListItems.map(listItem => (
         <li key={listItem.id}>
-          <BookRow user={user} book={listItem.book} />
+          <BookRow book={listItem.book} />
         </li>
       ))}
     </BookListUL>

@@ -8,7 +8,6 @@ import debounceFn from 'debounce-fn';
 import {useParams} from 'react-router-dom';
 
 import {ListItem} from 'types/listItemTypes';
-import {User} from 'auth-provider';
 import * as mq from 'styles/media-queries';
 import * as colors from 'styles/colors';
 import {StatusButtons} from 'components/StatusButtons';
@@ -19,12 +18,11 @@ import {useBook} from 'utils/books';
 import {useListItem, useUpdateListItem} from 'utils/list-items';
 
 type BookScreenParams = {bookId: string};
-type BookScreenProps = {user: User};
 
-const BookScreen: FC<BookScreenProps> = ({user}) => {
+const BookScreen: FC = () => {
   const {bookId} = useParams<BookScreenParams>();
-  const book = useBook(bookId, user);
-  const listItem = useListItem(user, bookId);
+  const book = useBook(bookId);
+  const listItem = useListItem(bookId);
   const {title, author, coverImageUrl, publisher, synopsis} = book;
 
   return (
@@ -66,15 +64,11 @@ const BookScreen: FC<BookScreenProps> = ({user}) => {
                 minHeight: 100,
               }}
             >
-              {book.loadingBook ? null : (
-                <StatusButtons user={user} book={book} />
-              )}
+              {book.loadingBook ? null : <StatusButtons book={book} />}
             </div>
           </div>
           <div css={{marginTop: 10, height: 46}}>
-            {listItem?.finishDate ? (
-              <Rating user={user} listItem={listItem} />
-            ) : null}
+            {listItem?.finishDate ? <Rating listItem={listItem} /> : null}
             {listItem ? <ListItemTimeframe listItem={listItem} /> : null}
           </div>
           <br />
@@ -82,7 +76,7 @@ const BookScreen: FC<BookScreenProps> = ({user}) => {
         </div>
       </div>
       {!book.loadingBook && listItem ? (
-        <NotesTextarea user={user} listItem={listItem} />
+        <NotesTextarea listItem={listItem} />
       ) : null}
     </div>
   );
@@ -107,9 +101,9 @@ function ListItemTimeframe({listItem}: ListItemTimeframeProps) {
   );
 }
 
-type NotesTextareaProps = {listItem: ListItem; user: User};
-function NotesTextarea({listItem, user}: NotesTextareaProps) {
-  const [mutate, {error, isError, isLoading}] = useUpdateListItem(user);
+type NotesTextareaProps = {listItem: ListItem};
+function NotesTextarea({listItem}: NotesTextareaProps) {
+  const [mutate, {error, isError, isLoading}] = useUpdateListItem();
   const debouncedMutate = React.useMemo(() => debounceFn(mutate, {wait: 300}), [
     mutate,
   ]);

@@ -1,14 +1,10 @@
 import React from 'react';
 import {Link} from 'components/lib';
 import {ListItemList} from 'components/ListItemList';
-import {User} from '../auth-provider';
 
-type FinishedScreenProps = {user: User};
-
-function FinishedScreen({user}: FinishedScreenProps) {
+function FinishedScreen() {
   return (
     <ListItemList
-      user={user}
       filterListItems={li => Boolean(li.finishDate)}
       noListItems={
         <p>

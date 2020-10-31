@@ -6,15 +6,12 @@ import '@reach/dialog/styles.css';
 import {Button} from './components/lib';
 import {Modal, ModalContents, ModalOpenButton} from './components/modal';
 import {Logo} from './components/Logo';
-import {LoginForm, Props as LoginFormProps} from './components/LoginForm';
-import {FC} from 'react';
+import {LoginForm} from './components/LoginForm';
+import {useContext} from 'react';
+import {AuthContext} from 'context/auth-context';
 
-type Props = {
-  login: LoginFormProps['onSubmit'];
-  register: LoginFormProps['onSubmit'];
-};
-
-const UnauthenticatedApp: FC<Props> = ({login, register}) => {
+const UnauthenticatedApp = () => {
+  const {login, register} = useContext(AuthContext);
   return (
     <div
       css={{

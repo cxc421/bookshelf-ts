@@ -3,14 +3,14 @@ import {jsx} from '@emotion/core';
 
 import {useEffect} from 'react';
 import {BrowserRouter as Router} from 'react-router-dom';
+import {queryCache} from 'react-query';
 import * as auth from 'auth-provider';
-import {AuthenticatedApp} from 'authenticated-app';
-import {UnauthenticatedApp} from 'unauthenticated-app';
 import {client} from 'utils/api-client';
 import {useAsync} from 'utils/hooks';
-import {FullPageSpinner} from 'components/lib';
-import * as colors from 'styles/colors';
-import {queryCache} from 'react-query';
+import {FullPageSpinner, FullPageErrorFallback} from 'components/lib';
+import {AuthContext} from 'context/auth-context';
+import {AuthenticatedApp} from 'authenticated-app';
+import {UnauthenticatedApp} from 'unauthenticated-app';
 
 async function getUser() {
   let user: null | auth.User = null;
@@ -56,32 +56,24 @@ function App() {
 
   if (isError) {
     return (
-      <div
-        css={{
-          color: colors.danger,
-          height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <p>Uh oh... There's a problem. Try refreshing the app.</p>
-        <pre>{error && error.message}</pre>
-      </div>
+      <FullPageErrorFallback error={error!} resetErrorBoundary={() => {}} />
     );
   }
 
   if (isSuccess) {
-    return user ? (
-      <Router>
-        <AuthenticatedApp user={user} logout={logout} />
-      </Router>
-    ) : (
-      <UnauthenticatedApp login={login} register={register} />
+    const props = {user, login, register, logout};
+    return (
+      <AuthContext.Provider value={props}>
+        {user ? (
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+        ) : (
+          <UnauthenticatedApp />
+        )}
+      </AuthContext.Provider>
     );
   }
-
   throw new Error(`Unhandle state`);
 }
 

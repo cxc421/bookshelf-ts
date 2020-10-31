@@ -13,7 +13,6 @@ import Tooltip from '@reach/tooltip';
 import {useAsync} from 'utils/hooks';
 import * as colors from 'styles/colors';
 import {CircleButton, Spinner} from './lib';
-import {User} from '../auth-provider';
 import {Book} from 'types/bookTypes';
 import {
   useListItem,
@@ -71,15 +70,14 @@ const TooltipButton: FC<TooltipButtonProps> = ({
 };
 
 type StatusButtonsProps = {
-  user: User;
   book: Book;
 };
 
-const StatusButtons: FC<StatusButtonsProps> = ({user, book}) => {
-  const listItem = useListItem(user, book.id);
-  const [updateListItem] = useUpdateListItem(user, {throwOnError: true});
-  const [removeListItem] = useRemoveListItem(user, {throwOnError: true});
-  const [createListItem] = useCreateListItem(user, {throwOnError: true});
+const StatusButtons: FC<StatusButtonsProps> = ({book}) => {
+  const listItem = useListItem(book.id);
+  const [updateListItem] = useUpdateListItem({throwOnError: true});
+  const [removeListItem] = useRemoveListItem({throwOnError: true});
+  const [createListItem] = useCreateListItem({throwOnError: true});
 
   return (
     <React.Fragment>

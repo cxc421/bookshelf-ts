@@ -1,11 +1,10 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-import {FC} from 'react';
+import {useContext} from 'react';
 import {Route, Link, LinkProps, Switch, useRouteMatch} from 'react-router-dom';
 import {Button, ErrorMessage, FullPageErrorFallback} from 'components/lib';
 import * as mq from 'styles/media-queries';
-import {User} from 'auth-provider';
 import {DiscoverBooksScreen} from 'screen/discover';
 import {BookScreen} from 'screen/book';
 import {NotFoundScreen} from 'screen/not-found';
@@ -13,12 +12,10 @@ import * as colors from 'styles/colors';
 import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
 import {ReadingListScreen} from 'screen/reading-list';
 import {FinishedScreen} from 'screen/finished';
+import {AuthContext} from 'context/auth-context';
 
-type AuthenticatedAppProps = {
-  user: User;
-  logout: () => Promise<void>;
-};
-const AuthenticatedApp: FC<AuthenticatedAppProps> = ({user, logout}) => {
+const AuthenticatedApp = () => {
+  const {user, logout} = useContext(AuthContext);
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       {/* Logout Button */}
@@ -31,7 +28,7 @@ const AuthenticatedApp: FC<AuthenticatedAppProps> = ({user, logout}) => {
           right: '10px',
         }}
       >
-        {user.username}
+        {user?.username}
         <Button variant="secondary" css={{marginLeft: '10px'}} onClick={logout}>
           Logout
         </Button>
@@ -60,7 +57,7 @@ const AuthenticatedApp: FC<AuthenticatedAppProps> = ({user, logout}) => {
         {/* Main Area */}
         <main css={{width: '100%'}}>
           <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AppRoutes user={user} />
+            <AppRoutes />
           </ErrorBoundary>
         </main>
       </div>
@@ -139,22 +136,20 @@ function NavLink(props: LinkProps) {
   );
 }
 
-type AppRoutesProps = {user: User};
-
-function AppRoutes({user}: AppRoutesProps) {
+function AppRoutes() {
   return (
     <Switch>
       <Route path="/list">
-        <ReadingListScreen user={user} />
+        <ReadingListScreen />
       </Route>
       <Route path="/finished">
-        <FinishedScreen user={user} />
+        <FinishedScreen />
       </Route>
       <Route path="/discover">
-        <DiscoverBooksScreen user={user} />
+        <DiscoverBooksScreen />
       </Route>
       <Route path="/book/:bookId">
-        <BookScreen user={user} />
+        <BookScreen />
       </Route>
       <Route>
         <NotFoundScreen />

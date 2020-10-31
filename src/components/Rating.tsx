@@ -5,7 +5,6 @@ import React, {FC} from 'react';
 import {useUpdateListItem} from 'utils/list-items';
 import {FaStar} from 'react-icons/fa';
 import * as colors from 'styles/colors';
-import {User} from 'auth-provider';
 import {ListItem} from 'types/listItemTypes';
 import {ErrorMessage} from 'components/lib';
 
@@ -22,12 +21,11 @@ const visuallyHiddenCSS: InterpolationWithTheme<any> = {
 
 type Props = {
   listItem: ListItem;
-  user: User;
 };
 
-const Rating: FC<Props> = ({listItem, user}) => {
+const Rating: FC<Props> = ({listItem}) => {
   const [isTabbing, setIsTabbing] = React.useState(false);
-  const [updateListItem, {error, isError}] = useUpdateListItem(user);
+  const [updateListItem, {error, isError}] = useUpdateListItem();
 
   React.useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
