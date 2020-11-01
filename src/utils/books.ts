@@ -1,7 +1,7 @@
-import {useCallback, useContext} from 'react';
+import {useCallback} from 'react';
 import {useQuery, queryCache} from 'react-query';
 import {User} from 'auth-provider';
-import {AuthContext} from 'context/auth-context';
+import {useUserExistAuth} from 'context/auth-context';
 import {Book} from 'types/bookTypes';
 import {client} from 'utils/api-client';
 import bookPlaceholderSvg from 'assets/book-placeholder.svg';
@@ -37,18 +37,18 @@ const getBookSearchConfig = (query: string, user: User) => ({
 });
 
 export function useBookSearch(query: string) {
-  const {user} = useContext(AuthContext);
-  const result = useQuery<Book[], Error>(getBookSearchConfig(query, user!));
+  const {user} = useUserExistAuth();
+  const result = useQuery<Book[], Error>(getBookSearchConfig(query, user));
 
   return {...result, books: result.data ?? loadingBooks};
 }
 
 export function useBook(bookId: string) {
-  const {user} = useContext(AuthContext);
+  const {user} = useUserExistAuth();
   const {data} = useQuery<Book, Error>({
     queryKey: ['book', {bookId}],
     queryFn: () =>
-      client(`books/${bookId}`, {token: user?.token}).then(data => data.book),
+      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
   });
 
   return data ?? loadingBook;
@@ -60,8 +60,8 @@ function refetchBookSearchQuery(user: User) {
 }
 
 export function useRefetchBookSearchQuery() {
-  const {user} = useContext(AuthContext);
-  return useCallback(() => refetchBookSearchQuery(user!), [user]);
+  const {user} = useUserExistAuth();
+  return useCallback(() => refetchBookSearchQuery(user), [user]);
 }
 
 const bookQueryConfig = {

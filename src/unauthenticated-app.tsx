@@ -7,11 +7,10 @@ import {Button} from './components/lib';
 import {Modal, ModalContents, ModalOpenButton} from './components/modal';
 import {Logo} from './components/Logo';
 import {LoginForm} from './components/LoginForm';
-import {useContext} from 'react';
-import {AuthContext} from 'context/auth-context';
+import {useAuth} from 'context/auth-context';
 
 const UnauthenticatedApp = () => {
-  const {login, register} = useContext(AuthContext);
+  const {login, register} = useAuth();
   return (
     <div
       css={{

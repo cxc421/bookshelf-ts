@@ -1,16 +1,15 @@
-import {useContext} from 'react';
-import {AuthContext} from 'context/auth-context';
+import {useUserExistAuth} from 'context/auth-context';
 import {useQuery, useMutation, queryCache, MutationConfig} from 'react-query';
 import {ListItem} from 'types/listItemTypes';
 import {client} from 'utils/api-client';
 import {setQueryDataForBook} from './books';
 
 export function useListItems() {
-  const {user} = useContext(AuthContext);
+  const {user} = useUserExistAuth();
   const {data} = useQuery<ListItem[], Error>({
     queryKey: 'list-items',
     queryFn: (key: string) =>
-      client(key, {token: user?.token}).then(data => data.listItems),
+      client(key, {token: user.token}).then(data => data.listItems),
     config: {
       onSuccess: (listItems: ListItem[]) =>
         listItems.forEach(({book, bookId}) =>
@@ -47,12 +46,12 @@ export function useUpdateListItem(
     | MutationConfig<any, Error, UpdateArgs, Function | undefined>
     | undefined,
 ) {
-  const {user} = useContext(AuthContext);
+  const {user} = useUserExistAuth();
   return useMutation<any, Error, UpdateArgs, Function | undefined>(
     (data: UpdateArgs) =>
       client(`list-items/${data.id}`, {
         method: 'PUT',
-        token: user?.token,
+        token: user.token,
         data,
       }),
     {
@@ -78,10 +77,10 @@ export function useRemoveListItem(
     | MutationConfig<any, Error, Pick<ListItem, 'id'>, Function | undefined>
     | undefined,
 ) {
-  const {user} = useContext(AuthContext);
+  const {user} = useUserExistAuth();
   return useMutation<any, Error, Pick<ListItem, 'id'>, Function | undefined>(
     ({id}: Pick<ListItem, 'id'>) =>
-      client(`list-items/${id}`, {method: 'DELETE', token: user?.token}),
+      client(`list-items/${id}`, {method: 'DELETE', token: user.token}),
     {
       onMutate(data) {
         const listItems = queryCache.getQueryData<ListItem[]>('list-items');
@@ -103,7 +102,7 @@ export function useCreateListItem(
     | MutationConfig<any, Error, Pick<ListItem, 'bookId'>, Function | undefined>
     | undefined,
 ) {
-  const {user} = useContext(AuthContext);
+  const {user} = useUserExistAuth();
   return useMutation<
     any,
     Error,
@@ -113,7 +112,7 @@ export function useCreateListItem(
     ({bookId}: Pick<ListItem, 'bookId'>) =>
       client(`list-items`, {
         method: 'POST',
-        token: user?.token,
+        token: user.token,
         data: {bookId},
       }),
     {...defaultMutationOptions, ...config},

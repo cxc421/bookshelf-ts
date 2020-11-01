@@ -1,7 +1,6 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
-import {useContext} from 'react';
 import {Route, Link, LinkProps, Switch, useRouteMatch} from 'react-router-dom';
 import {Button, ErrorMessage, FullPageErrorFallback} from 'components/lib';
 import * as mq from 'styles/media-queries';
@@ -12,10 +11,10 @@ import * as colors from 'styles/colors';
 import {ErrorBoundary, FallbackProps} from 'react-error-boundary';
 import {ReadingListScreen} from 'screen/reading-list';
 import {FinishedScreen} from 'screen/finished';
-import {AuthContext} from 'context/auth-context';
+import {useUserExistAuth} from 'context/auth-context';
 
 const AuthenticatedApp = () => {
-  const {user, logout} = useContext(AuthContext);
+  const {user, logout} = useUserExistAuth();
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       {/* Logout Button */}
@@ -28,7 +27,7 @@ const AuthenticatedApp = () => {
           right: '10px',
         }}
       >
-        {user?.username}
+        {user.username}
         <Button variant="secondary" css={{marginLeft: '10px'}} onClick={logout}>
           Logout
         </Button>
