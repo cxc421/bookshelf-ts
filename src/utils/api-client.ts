@@ -41,4 +41,5 @@ async function client(
   }
 }
 
+export type ClientType = typeof client;
 export {client};

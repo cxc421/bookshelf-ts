@@ -5,6 +5,7 @@ import {useAsync} from 'utils/hooks';
 import {client} from 'utils/api-client';
 
 import {FullPageSpinner, FullPageErrorFallback} from 'components/lib';
+import {useCallback} from 'react';
 
 type AuthContextType = {
   user: auth.User | null;
@@ -88,4 +89,14 @@ function useUserExistAuth() {
   return {...context, user};
 }
 
-export {AuthProvider, useAuth, useUserExistAuth};
+function useAuthClient() {
+  const {user} = useUserExistAuth();
+  const {token} = user;
+  return useCallback(
+    (endpoint: string, config?: Parameters<typeof client>[1]) =>
+      client(endpoint, {...config, token}),
+    [token],
+  );
+}
+
+export {AuthProvider, useAuth, useUserExistAuth, useAuthClient};

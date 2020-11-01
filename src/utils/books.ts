@@ -1,9 +1,8 @@
 import {useCallback} from 'react';
 import {useQuery, queryCache} from 'react-query';
-import {User} from 'auth-provider';
-import {useUserExistAuth} from 'context/auth-context';
+import {useAuthClient} from 'context/auth-context';
 import {Book} from 'types/bookTypes';
-import {client} from 'utils/api-client';
+import {ClientType} from 'utils/api-client';
 import bookPlaceholderSvg from 'assets/book-placeholder.svg';
 
 const loadingBook: Book = {
@@ -23,12 +22,12 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
 
 type BooksQueryData = {books: Book[]};
 
-const getBookSearchConfig = (query: string, user: User) => ({
+const getBookSearchConfig = (query: string, client: ClientType) => ({
   queryKey: ['bookSearch', {query}],
   queryFn: (_key: string, {query}: {query: string}) =>
-    client(`books?query=${encodeURIComponent(query)}`, {
-      token: user.token,
-    }).then((data: BooksQueryData) => data.books),
+    client(`books?query=${encodeURIComponent(query)}`).then(
+      (data: BooksQueryData) => data.books,
+    ),
   config: {
     onSuccess(books: Book[]) {
       books.forEach(book => setQueryDataForBook(book.id, book));
@@ -37,31 +36,30 @@ const getBookSearchConfig = (query: string, user: User) => ({
 });
 
 export function useBookSearch(query: string) {
-  const {user} = useUserExistAuth();
-  const result = useQuery<Book[], Error>(getBookSearchConfig(query, user));
+  const authClient = useAuthClient();
+  const result = useQuery<Book[], Error>(
+    getBookSearchConfig(query, authClient),
+  );
 
   return {...result, books: result.data ?? loadingBooks};
 }
 
 export function useBook(bookId: string) {
-  const {user} = useUserExistAuth();
+  const authClient = useAuthClient();
   const {data} = useQuery<Book, Error>({
     queryKey: ['book', {bookId}],
-    queryFn: () =>
-      client(`books/${bookId}`, {token: user.token}).then(data => data.book),
+    queryFn: () => authClient(`books/${bookId}`).then(data => data.book),
   });
 
   return data ?? loadingBook;
 }
 
-function refetchBookSearchQuery(user: User) {
-  // queryCache.removeQueries('bookSearch');
-  queryCache.prefetchQuery(getBookSearchConfig('', user));
-}
-
 export function useRefetchBookSearchQuery() {
-  const {user} = useUserExistAuth();
-  return useCallback(() => refetchBookSearchQuery(user), [user]);
+  const authClient = useAuthClient();
+  return useCallback(() => {
+    // queryCache.removeQueries('bookSearch');
+    queryCache.prefetchQuery(getBookSearchConfig('', authClient));
+  }, [authClient]);
 }
 
 const bookQueryConfig = {
