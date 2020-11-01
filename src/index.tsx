@@ -5,6 +5,7 @@ import {ReactQueryConfigProvider, ReactQueryConfig} from 'react-query';
 import {loadDevTools} from './dev-tools/load';
 import './bootstrap';
 import {App} from './app';
+import {AuthProvider} from 'context/auth-context';
 import {CustomError} from './test/types';
 
 const queryConfig: ReactQueryConfig = {
@@ -27,7 +28,9 @@ const queryConfig: ReactQueryConfig = {
 loadDevTools(() => {
   ReactDOM.render(
     <ReactQueryConfigProvider config={queryConfig}>
-      <App />
+      <AuthProvider>
+        <App />
+      </AuthProvider>
     </ReactQueryConfigProvider>,
     document.getElementById('root'),
   );
