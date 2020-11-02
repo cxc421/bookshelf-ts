@@ -18,7 +18,7 @@ import {useAuth} from 'context/auth-context';
 const circleDismissButton = (
   <div css={{display: 'flex', justifyContent: 'flex-end'}}>
     <ModalDismissButton>
-      <CircleButton>
+      <CircleButton onClick={() => console.log(`close the modal`)}>
         <VisuallyHidden>Close</VisuallyHidden>
         <span aria-hidden>×</span>
       </CircleButton>
@@ -50,7 +50,12 @@ const UnauthenticatedApp = () => {
       >
         <Modal>
           <ModalOpenButton>
-            <Button variant="primary">Login</Button>
+            <Button
+              variant="primary"
+              onClick={() => console.log('opening the login modal')}
+            >
+              Login
+            </Button>
           </ModalOpenButton>
           <ModalContents aria-label="Login form">
             {circleDismissButton}
@@ -64,7 +69,12 @@ const UnauthenticatedApp = () => {
 
         <Modal>
           <ModalOpenButton>
-            <Button variant="secondary">Register</Button>
+            <Button
+              variant="secondary"
+              onClick={() => console.log('opening the register modal')}
+            >
+              Register
+            </Button>
           </ModalOpenButton>
           <ModalContents aria-label="Registration form">
             {circleDismissButton}

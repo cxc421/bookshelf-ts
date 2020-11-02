@@ -6,6 +6,9 @@ import {DialogProps} from '@reach/dialog';
 
 import {Dialog} from './lib';
 
+const callAll = (...fns: (Function | undefined)[]) => (...args: any[]) =>
+  fns.forEach(fn => fn && fn(...args));
+
 type ModalContextType = [boolean, Dispatch<SetStateAction<boolean>>];
 const ModalContext = React.createContext<ModalContextType | null>(null);
 
@@ -26,7 +29,9 @@ const ModalDismissButton: FC = ({children: child}) => {
   if (!React.isValidElement(child)) {
     return null;
   }
-  return React.cloneElement(child, {onClick: () => setIsOpen(false)});
+  return React.cloneElement(child, {
+    onClick: callAll(child.props.onClick, () => setIsOpen(false)),
+  });
 };
 
 const ModalOpenButton: FC = ({children: child}) => {
@@ -34,7 +39,9 @@ const ModalOpenButton: FC = ({children: child}) => {
   if (!React.isValidElement(child)) {
     return null;
   }
-  return React.cloneElement(child, {onClick: () => setIsOpen(true)});
+  return React.cloneElement(child, {
+    onClick: callAll(child.props.onClick, () => setIsOpen(true)),
+  });
 };
 
 const ModalContents: FC<Omit<DialogProps, 'isOpen' | 'setIsOpen'>> = props => {
