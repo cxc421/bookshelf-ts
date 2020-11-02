@@ -3,8 +3,9 @@ import {jsx} from '@emotion/core';
 
 import React, {FC, Dispatch, SetStateAction} from 'react';
 import {DialogProps} from '@reach/dialog';
+import VisuallyHidden from '@reach/visually-hidden';
 
-import {Dialog} from './lib';
+import {Dialog, CircleButton} from './lib';
 
 const callAll = (...fns: (Function | undefined)[]) => (...args: any[]) =>
   fns.forEach(fn => fn && fn(...args));
@@ -44,7 +45,8 @@ const ModalOpenButton: FC = ({children: child}) => {
   });
 };
 
-const ModalContents: FC<Omit<DialogProps, 'isOpen' | 'setIsOpen'>> = props => {
+type ModalContentsBaseProps = Omit<DialogProps, 'isOpen' | 'setIsOpen'>;
+const ModalContentsBase: FC<ModalContentsBaseProps> = props => {
   const [isOpen, setIsOpen] = useModalContext();
 
   return (
@@ -52,4 +54,33 @@ const ModalContents: FC<Omit<DialogProps, 'isOpen' | 'setIsOpen'>> = props => {
   );
 };
 
-export {Modal, ModalDismissButton, ModalOpenButton, ModalContents};
+// Default usecase to use ModalContentsBase
+type ModalContentsProps = ModalContentsBaseProps & {title?: string};
+const ModalContents: FC<ModalContentsProps> = ({
+  children,
+  title = '',
+  ...otherProps
+}) => {
+  return (
+    <ModalContentsBase {...otherProps}>
+      <div css={{display: 'flex', justifyContent: 'flex-end'}}>
+        <ModalDismissButton>
+          <CircleButton onClick={() => console.log(`close the modal`)}>
+            <VisuallyHidden>Close</VisuallyHidden>
+            <span aria-hidden>×</span>
+          </CircleButton>
+        </ModalDismissButton>
+      </div>
+      <h3 css={{textAlign: 'center', fontSize: '2em'}}>{title}</h3>
+      {children}
+    </ModalContentsBase>
+  );
+};
+
+export {
+  Modal,
+  ModalDismissButton,
+  ModalOpenButton,
+  ModalContentsBase,
+  ModalContents,
+};

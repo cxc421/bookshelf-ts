@@ -2,29 +2,12 @@
 import {jsx} from '@emotion/core';
 
 import 'bootstrap/dist/css/bootstrap-reboot.css';
-import VisuallyHidden from '@reach/visually-hidden';
 import '@reach/dialog/styles.css';
-import {Button, CircleButton} from './components/lib';
-import {
-  Modal,
-  ModalContents,
-  ModalOpenButton,
-  ModalDismissButton,
-} from './components/modal';
+import {Button} from './components/lib';
+import {Modal, ModalContents, ModalOpenButton} from './components/modal';
 import {Logo} from './components/Logo';
 import {LoginForm} from './components/LoginForm';
 import {useAuth} from 'context/auth-context';
-
-const circleDismissButton = (
-  <div css={{display: 'flex', justifyContent: 'flex-end'}}>
-    <ModalDismissButton>
-      <CircleButton onClick={() => console.log(`close the modal`)}>
-        <VisuallyHidden>Close</VisuallyHidden>
-        <span aria-hidden>×</span>
-      </CircleButton>
-    </ModalDismissButton>
-  </div>
-);
 
 const UnauthenticatedApp = () => {
   const {login, register} = useAuth();
@@ -57,9 +40,7 @@ const UnauthenticatedApp = () => {
               Login
             </Button>
           </ModalOpenButton>
-          <ModalContents aria-label="Login form">
-            {circleDismissButton}
-            <h3 css={{textAlign: 'center', fontSize: '2em'}}>Login</h3>
+          <ModalContents title="Login" aria-label="Login form">
             <LoginForm
               onSubmit={login}
               submitButton={<Button variant="primary">Login</Button>}
@@ -76,9 +57,7 @@ const UnauthenticatedApp = () => {
               Register
             </Button>
           </ModalOpenButton>
-          <ModalContents aria-label="Registration form">
-            {circleDismissButton}
-            <h3 css={{textAlign: 'center', fontSize: '2em'}}>Register</h3>
+          <ModalContents title="Register" aria-label="Registration form">
             <LoginForm
               onSubmit={register}
               submitButton={<Button variant="secondary">Register</Button>}
