@@ -69,4 +69,4 @@ const UnauthenticatedApp = () => {
   );
 };
 
-export {UnauthenticatedApp};
+export default UnauthenticatedApp;

@@ -1,13 +1,20 @@
 /** @jsx jsx */
 import {jsx} from '@emotion/core';
 
+import {lazy, Suspense} from 'react';
 import {useAuth} from 'context/auth-context';
-import {AuthenticatedApp} from 'authenticated-app';
-import {UnauthenticatedApp} from 'unauthenticated-app';
+import {FullPageSpinner} from 'components/lib';
+
+const AuthenticatedApp = lazy(() => import('authenticated-app'));
+const UnauthenticatedApp = lazy(() => import('unauthenticated-app'));
 
 function App() {
   const {user} = useAuth();
-  return !user ? <UnauthenticatedApp /> : <AuthenticatedApp />;
+  return (
+    <Suspense fallback={<FullPageSpinner />}>
+      {!user ? <UnauthenticatedApp /> : <AuthenticatedApp />}
+    </Suspense>
+  );
 }
 
 export {App};

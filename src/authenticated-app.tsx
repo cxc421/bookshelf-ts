@@ -172,4 +172,4 @@ function ErrorFallback({error}: FallbackProps) {
   );
 }
 
-export {AuthenticatedApp};
+export default AuthenticatedApp;
