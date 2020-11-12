@@ -1,4 +1,4 @@
-import React, {createContext, FC, useContext, useEffect} from 'react';
+import React, {createContext, FC, useContext, useEffect, useMemo} from 'react';
 import {queryCache} from 'react-query';
 import * as auth from 'auth-provider';
 import {useAsync} from 'utils/hooks';
@@ -44,16 +44,31 @@ const AuthProvider: FC = ({children}) => {
     run(getUser());
   }, [run]);
 
-  const login = (form: auth.User) =>
-    auth.login(form).then(user => setData(user));
-  const register = (form: auth.User) =>
-    auth.register(form).then(u => setData(u));
-  const logout = () =>
-    auth.logout().then(() => {
-      // clear query cache when logout
-      queryCache.clear();
-      setData(null);
-    });
+  const login = useCallback(
+    (form: auth.User) => auth.login(form).then(user => setData(user)),
+    [setData],
+  );
+  const register = useCallback(
+    (form: auth.User) => auth.register(form).then(u => setData(u)),
+    [setData],
+  );
+  const logout = useCallback(
+    () =>
+      auth.logout().then(() => {
+        // clear query cache when logout
+        queryCache.clear();
+        setData(null);
+      }),
+    [setData],
+  );
+  // Only for practice, actually no usecase for useMemo / useCallback
+  const value = useMemo(() => ({user, login, register, logout}), [
+    login,
+    logout,
+    register,
+    user,
+  ]);
+
   if (isLoading || isIdle) {
     return <FullPageSpinner />;
   }
@@ -65,9 +80,8 @@ const AuthProvider: FC = ({children}) => {
   }
 
   if (isSuccess) {
-    const props = {user, login, register, logout};
     return (
-      <AuthContext.Provider value={props}>{children}</AuthContext.Provider>
+      <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
     );
   }
   throw new Error(`Unhandle state`);
