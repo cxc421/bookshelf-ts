@@ -6,6 +6,7 @@ import {BookRow} from './BookRow';
 import {ListItem} from 'types/listItemTypes';
 import {ReactElement, FC} from 'react';
 import {useListItems} from 'utils/list-items';
+import {Profiler} from './Profiler';
 
 type ListItemListProps = {
   filterListItems: (listTem: ListItem) => boolean;
@@ -34,13 +35,18 @@ const ListItemList: FC<ListItemListProps> = ({
   }
 
   return (
-    <BookListUL>
-      {filteredListItems.map(listItem => (
-        <li key={listItem.id}>
-          <BookRow book={listItem.book} />
-        </li>
-      ))}
-    </BookListUL>
+    <Profiler
+      id="List Item List"
+      metadata={{listItemCount: filteredListItems.length}}
+    >
+      <BookListUL>
+        {filteredListItems.map(listItem => (
+          <li key={listItem.id}>
+            <BookRow book={listItem.book} />
+          </li>
+        ))}
+      </BookListUL>
+    </Profiler>
   );
 };
 

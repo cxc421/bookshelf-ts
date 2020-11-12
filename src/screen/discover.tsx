@@ -6,6 +6,7 @@ import Tooltip from '@reach/tooltip';
 import {FaSearch, FaTimes} from 'react-icons/fa';
 import {Input, BookListUL, Spinner} from 'components/lib';
 import {BookRow} from 'components/BookRow';
+import {Profiler} from 'components/Profiler';
 import * as colors from 'styles/colors';
 import {useBookSearch, useRefetchBookSearchQuery} from 'utils/books';
 
@@ -91,13 +92,18 @@ const DiscoverBooksScreen: FC = () => {
       {/* Book List */}
       {isSuccess ? (
         books.length ? (
-          <BookListUL css={{marginTop: 20}}>
-            {books.map(book => (
-              <li key={book.id}>
-                <BookRow key={book.id} book={book} />
-              </li>
-            ))}
-          </BookListUL>
+          <Profiler
+            id="Discover Books Screen Book List"
+            metadata={{query, bookCount: books.length}}
+          >
+            <BookListUL css={{marginTop: 20}}>
+              {books.map(book => (
+                <li key={book.id}>
+                  <BookRow key={book.id} book={book} />
+                </li>
+              ))}
+            </BookListUL>
+          </Profiler>
         ) : (
           <p>No books found. Try another search.</p>
         )
