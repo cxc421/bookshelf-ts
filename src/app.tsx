@@ -5,7 +5,9 @@ import {lazy, Suspense} from 'react';
 import {useAuth} from 'context/auth-context';
 import {FullPageSpinner} from 'components/lib';
 
-const AuthenticatedApp = lazy(() => import('authenticated-app'));
+const AuthenticatedApp = lazy(
+  () => import(/* webpackPrefetch: true */ 'authenticated-app'),
+);
 const UnauthenticatedApp = lazy(() => import('unauthenticated-app'));
 
 function App() {
