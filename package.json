@@ -57,6 +57,7 @@
   "devDependencies": {
     "@types/match-sorter": "^4.0.0",
     "@types/react-router-dom": "^5.1.6",
+    "@types/scheduler": "^0.16.1",
     "@types/webpack-env": "^1.15.3",
     "cross-env": "~7.0.2",
     "cypress": "^5.4.0",

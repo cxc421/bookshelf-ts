@@ -1,4 +1,5 @@
 import React from 'react';
+import {wrap} from 'components/Profiler';
 
 function useSafeDispatch(dispatch: React.Dispatch<any>) {
   const mounted = React.useRef(false);
@@ -65,14 +66,14 @@ function useAsync<T = any>(
       }
       safeSetState({status: 'pending'});
       return promise.then(
-        (data: T) => {
+        wrap((data: T) => {
           setData(data);
           return data;
-        },
-        (error: Error) => {
+        }),
+        wrap((error: Error) => {
           setError(error);
           return Promise.reject(error);
-        },
+        }),
       );
     },
     [safeSetState, setData, setError],

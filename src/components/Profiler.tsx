@@ -46,14 +46,15 @@ const Profiler: FC<ProfilerProps> = ({metadata, phases, ...props}) => {
   ) => {
     if (!phases || phases.includes(phase)) {
       queue.push({
-        metadata,
         id,
+        metadata,
         phase,
         actualDuration,
         baseDuration,
         startTime,
         commitTime,
-        interactions,
+        // Transfer Set to Array  so browser can display on dev tool.
+        interactions: [...(interactions as any)] as any,
       });
     }
   };
@@ -61,3 +62,7 @@ const Profiler: FC<ProfilerProps> = ({metadata, phases, ...props}) => {
 };
 
 export {Profiler};
+export {
+  unstable_trace as trace,
+  unstable_wrap as wrap,
+} from 'scheduler/tracing';

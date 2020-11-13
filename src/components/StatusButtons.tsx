@@ -20,6 +20,7 @@ import {
   useRemoveListItem,
   useCreateListItem,
 } from 'utils/list-items';
+import {trace} from 'components/Profiler';
 
 type TooltipButtonProps = {
   label: string;
@@ -41,7 +42,9 @@ const TooltipButton: FC<TooltipButtonProps> = ({
     if (isError) {
       reset();
     } else {
-      run(onClick());
+      trace(`Click ${label}`, performance.now(), () => {
+        run(onClick());
+      });
     }
   }
 
