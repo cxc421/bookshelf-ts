@@ -18,12 +18,13 @@ const AuthContext = createContext<AuthContextType | null>(null);
 AuthContext.displayName = 'AuthContext';
 
 async function getUser() {
-  console.log(`Get user`);
   let user: null | auth.User = null;
 
   const token = await auth.getToken();
   if (token) {
-    const data = await client('me', {token});
+    const data = await client('bootstrap', {token});
+    // StaleTime not work?
+    queryCache.setQueryData('list-items', data.listItems, {staleTime: 5000});
     user = data.user as auth.User;
   }
   return user;
