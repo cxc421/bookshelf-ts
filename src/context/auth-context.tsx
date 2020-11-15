@@ -18,6 +18,7 @@ const AuthContext = createContext<AuthContextType | null>(null);
 AuthContext.displayName = 'AuthContext';
 
 async function getUser() {
+  console.log(`Get user`);
   let user: null | auth.User = null;
 
   const token = await auth.getToken();
@@ -28,6 +29,7 @@ async function getUser() {
   return user;
 }
 
+const userProfile = getUser();
 const AuthProvider: FC = ({children}) => {
   const {
     data: user,
@@ -41,7 +43,8 @@ const AuthProvider: FC = ({children}) => {
   } = useAsync<auth.User | null>();
 
   useEffect(() => {
-    run(getUser());
+    console.log(`Mounted`);
+    run(userProfile);
   }, [run]);
 
   const login = useCallback(
